@@ -15,30 +15,36 @@
 #' 
 
 check_install_load=function(pkg
-                            ,version
+                            ,version=NULL
                             ,repo=c('cran','bioc','devtools','github')
+                            ,bioc=NULL
                             ,load=T){
   
   # Check if this package is already installed; otherwise, set install true
   if(pkg%in%installed.packages()[,1]){
     
-    # Set install true if only the version is not the expected one
-    if(packageVersion(pkg)==version){
-      is.install=FALSE
+    # Check if version is specified
+    if(!is.null(version)){
+      # Set install true if only the version is not the expected one
+      if(packageVersion(pkg)==version){
+        is.install=FALSE
+      }else{
+        is.install=TRUE
+      }
     }else{
-      is.install=TRUE
+      is.install=FALSE
     }
     
   }else{
     is.install=TRUE
   }
   
-  # Install the oackage depending on the repo
+  # Install the package depending on the repo
   if(is.install){
     if(repo=='cran'){
       install.packages(pkg)
     }else if(repo=='bioc'){
-      BiocManager::install(pkg,update=F)
+      BiocManager::install(pkg,version=bioc,update=F,force=T)
     }else if(repo=='devtools'){
       devtools::install_version(pkg,version,upgrade=F)
     }else{

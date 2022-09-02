@@ -1,6 +1,6 @@
 ---
-title: 'Blood biomarkers representing maternal-fetal interface tissues for 
-        predicting early-and late-onset preeclampsia but not COVID-19 infection'
+title: 'Blood biomarkers representing maternal-fetal interface tissues used to 
+        predict early-and late-onset preeclampsia but not COVID-19 infection'
 author:
   - name: Herdiantri Sufriyana
     affiliation:
@@ -8,7 +8,6 @@ author:
       Science and Technology, Taipei Medical University, Taipei, Taiwan
     - Department of Medical Physiology, Faculty of Medicine, Universitas 
       Nahdlatul Ulama Surabaya, Surabaya, Indonesia
-    email: herdiantrisufriyana@unusa.ac.id
   - name: Hotimah Masdan Salim
     affiliation:
     - Department of Molecular Biology, Faculty of Medicine, Universitas 
@@ -28,6 +27,7 @@ author:
     - *tmuh
     - Research Center for Artificial Intelligence in Medicine, Taipei Medical
       University, Taipei, Taiwan
+    email: emilysu@tmu.edu.tw
 output: 
   html_document
   # pdf_document
@@ -39,8 +39,7 @@ always_allow_html: yes
 # Set up programming environment
 
 ```{r Set up reproducible environment, include=FALSE}
-if(!require(renv)) install.packages('renv')
-if(!file.exists('renv')) renv::init(restart=F)
+renv::restore()
 ```
 
 ```{r Set sample kind, include=FALSE}
@@ -64,107 +63,54 @@ memory.limit(size=1000000000)
 Sys.setenv('VROOM_CONNECTION_SIZE'=128000*1024)
 ```
 
-```{r Install and set specific version of Bioconductor, include=FALSE}
-source('R/check_install_load-function.R')
-
-# Install devtools to install specific version of BiocManager.
-check_install_load('devtools',version='2.4.2',repo='cran',load=F)
-
-# Install specific version of BiocManager and Bioconductor.
-check_install_load('BiocManager',version='1.30.10',repo='cran',load=F)
-install_steps=T
-if(BiocManager::version()!='3.11'){
-  BiocManager::install(version='3.11',update=TRUE,ask=FALSE)
-  install_steps=c(F,T)
-}
-```
-
-```{r Install and load packages with specific version, include=FALSE}
-for(i in install_steps){
-  if(i) renv::restore()
+```{r Load packages, include=FALSE}
+library(tidyverse)
+library(dslabs)
+library(GEOquery)
+library(Biobase)
+library(biomaRt)
+library(oligo)
+library(RSQLite)
+library(DBI)
+library(Rcpp)
+library(pd.hugene.1.0.st.v1)
+library(pd.hta.2.0)
+library(pd.clariom.s.human)
+library(limma)
+library(illuminaio)
+library(parallelDist)
+library(WGCNA)
+library(sva)
+library(pbapply)
+library(lubridate)
+library(rsdr)
+library(caret)
+library(glmnet)
+library(Rborist)
+library(gbm)
+library(gam)
+library(MLeval)
+library(doParallel)
+library(preprocessCore)
+library(matrixStats)
+library(Rtsne)
+library(clixo)
+library(divnn)
+library(igraph)
+library(reticulate)
+library(ggnetwork)
+library(rpart.plot)
+library(knitr)
+library(kableExtra)
   
-  check_install_load('tidyverse','1.3.1',repo='bioc',load=i)
-  check_install_load('dslabs','0.7.4',repo='bioc',load=i)
-  check_install_load('GEOquery','2.56.0',repo='bioc',load=i)
-  check_install_load('Biobase','2.48.0',repo='bioc',load=i)
-  check_install_load('a4Base','1.36.0',repo='bioc',load=F)
-  check_install_load('biomaRt','2.44.4',repo='bioc',load=i)
-  check_install_load('oligo','1.52.1',repo='bioc',load=i)
-  check_install_load('RSQLite','2.2.7',repo='bioc',load=i)
-  check_install_load('DBI','1.1.1',repo='bioc',load=i)
-  check_install_load('Rcpp','1.0.7',repo='bioc',load=i)
-  check_install_load('pd.hugene.1.0.st.v1','3.14.1',repo='bioc',load=i)
-  check_install_load('pd.hta.2.0','3.12.2',repo='bioc',load=i)
-  check_install_load('pd.clariom.s.human','3.14.1',repo='bioc',load=i)
-  check_install_load('limma','3.44.3',repo='bioc',load=i)
-  check_install_load('illuminaio','0.30.0',repo='bioc',load=i)
-  check_install_load('parallelDist','0.2.4',repo='bioc',load=i)
-  check_install_load('WGCNA','1.70.3',repo='bioc',load=i)
-  check_install_load('sva','3.36.0',repo='bioc',load=i)
-  check_install_load('pbapply','1.4.3',repo='bioc',load=i)
-  check_install_load('lubridate','1.7.10',repo='bioc',load=i)
-  check_install_load('rsdr','0.1.0',repo='herdiantrisufriyana',load=i)
-  check_install_load('caret','6.0.88',repo='bioc',load=i)
-  check_install_load('glmnet','4.1.2',repo='bioc',load=i)
-  check_install_load('Rborist','0.2.3',repo='bioc',load=i)
-  check_install_load('gbm','2.1.8',repo='bioc',load=i)
-  check_install_load('gam','1.20',repo='bioc',load=i)
-  check_install_load('MLeval','0.3',repo='bioc',load=i)
-  check_install_load('parallel','4.0.2',repo='bioc',load=i)
-  check_install_load('doParallel','1.0.16',repo='bioc',load=i)
-  check_install_load('preprocessCore','1.50.0',repo='bioc',load=i)
-  check_install_load('matrixStats','0.56.0',repo='bioc',load=i)
-  check_install_load('Rtsne','0.15',repo='bioc',load=i)
-  check_install_load('clixo','0.1.1',repo='herdiantrisufriyana',load=i)
-  check_install_load('divnn','0.1.3',repo='herdiantrisufriyana',load=i)
-  check_install_load('igraph','1.2.6',repo='bioc',load=i)
-  check_install_load('reticulate','1.16',repo='bioc',load=i)
-  check_install_load('tensorflow','2.0.0',repo='devtools',load=F)
-  check_install_load('keras','2.3.0.0',repo='devtools',load=F)
-  check_install_load('ggnetwork','0.5.10',repo='bioc',load=i)
-  check_install_load('STRINGdb','2.0.2',repo='bioc',load=i)
-  check_install_load('ReactomePA','1.32.0',repo='bioc',load=i)
-  check_install_load('org.Hs.eg.db','3.11.4',repo='bioc',load=i)
-  check_install_load('rpart.plot','3.1.0',repo='bioc',load=i)
-  check_install_load('knitr','1.37',repo='bioc',load=i)
-  check_install_load('kableExtra','1.3.4',repo='bioc',load=i)
-  
-  if(i){
-    options(dplyr.summarise.inform=F)
-    dslabs::ds_theme_set()
-    select=dplyr::select
-    summarize=dplyr::summarize
-    rename=dplyr::rename
-    slice=dplyr::slice
-    reticulate::use_condaenv('./renv/python/condaenvs/renv-python',required=T)
-    renv::use_python(name='./renv/python/condaenvs/renv-python')
-  }else{
-    reticulate::conda_create(
-      envname='./renv/python/condaenvs/renv-python'
-      ,packages='python=3.6.3'
-    )
-    reticulate::use_condaenv('./renv/python/condaenvs/renv-python',required=T)
-    renv::use_python(name='./renv/python/condaenvs/renv-python')
-    reticulate::conda_install(
-      envname='./renv/python/condaenvs/renv-python'
-      ,packages='git'
-      ,python_version='3.6.3'
-    )
-    keras::install_keras(
-      method='conda',
-      version='2.3.0',
-      tensorflow='2.0.0-gpu',
-      envname='./renv/python/condaenvs/renv-python',
-      conda_python_version='3.6.3',
-      extra_packages=
-        c('numpy','pandas','matplotlib==3.1.0','scikit-learn','h5py==2.10.0'),
-      restart_session=F
-    )
-    renv::snapshot()
-  }
-}
-
-rm(i)
+options(dplyr.summarise.inform=F)
+dslabs::ds_theme_set()
+select=dplyr::select
+summarize=dplyr::summarize
+rename=dplyr::rename
+slice=dplyr::slice
+reticulate::use_condaenv('./renv/python/condaenvs/renv-python',required=T)
+renv::use_python(name='./renv/python/condaenvs/renv-python')
 ```
 
 ```{r}
@@ -12961,6 +12907,22 @@ rbind(
 timestamper[16]=as.character(now())
 ```
 
+```{r}
+timestamper %>%
+  data.frame(seq=seq(length(.)),timestamp=.) %>%
+  mutate(timestamp=as_datetime(timestamp)) %>%
+  mutate(timestamp=timestamp-min(timestamp)) %>%
+  mutate(timestamp=as.duration(timestamp)/dminutes(1)) %>%
+  left_join(
+    mutate(.,seq=seq+1) %>%
+      rename(timestamp0=timestamp)
+    ,by='seq'
+  ) %>%
+  slice(-1) %>%
+  mutate(duration=timestamp-timestamp0) %>%
+  ggplot(aes(seq,duration)) +
+  geom_col()
+```
 
 
 
