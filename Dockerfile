@@ -31,4 +31,5 @@ COPY R/take_common_genes-function.R R/take_common_genes-function.R
 COPY R/test_transformer-function.R R/test_transformer-function.R
 COPY R/trainer_generator-function.R R/trainer_generator-function.R
 
+RUN R -e 'renv::consent()'
 RUN R --vanilla -s -e 'renv::restore()'
