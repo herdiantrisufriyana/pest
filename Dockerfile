@@ -17,7 +17,7 @@ COPY .gitignore .gitignore
 COPY Dockerfile Dockerfile
 COPY LICENSE LICENSE
 COPY README.md README.md
-COPY ./pest.rmd ./pest.rmd
+COPY pest.Rmd pest.Rmd
 COPY renv/activate.R renv/activate.R
 COPY renv/settings.dcf renv/settings.dcf
 COPY R/check_install_load-function.R R/check_install_load-function.R
