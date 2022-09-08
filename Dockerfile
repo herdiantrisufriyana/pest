@@ -14,8 +14,6 @@ COPY LICENSE /home/rstudio/
 COPY README.md /home/rstudio/
 COPY pest.Rmd /home/rstudio/
 
-ENV RENV_PATHS_LIBRARY renv/library
-
 RUN mkdir -p renv
 RUN mkdir -p R
 COPY renv/activate.R /home/rstudio/renv/
@@ -30,5 +28,3 @@ COPY R/suspected_outliers-function.R /home/rstudio/R/
 COPY R/take_common_genes-function.R /home/rstudio/R/
 COPY R/test_transformer-function.R /home/rstudio/R/
 COPY R/trainer_generator-function.R /home/rstudio/R/
-
-# RUN R --vanilla -s -e 'renv::restore()'
