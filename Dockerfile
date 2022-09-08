@@ -30,4 +30,4 @@ COPY R/take_common_genes-function.R /home/rstudio/R/
 COPY R/test_transformer-function.R /home/rstudio/R/
 COPY R/trainer_generator-function.R /home/rstudio/R/
 
-# RUN R --vanilla -s -e 'renv::restore()'
+RUN R --vanilla -s -e 'renv::restore()'
