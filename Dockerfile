@@ -14,7 +14,7 @@ COPY environment.yml /home/rstudio/
 # COPY README.md /home/rstudio/
 COPY pest.Rmd /home/rstudio/
 
-RUN mkdir -p renv
+# RUN mkdir -p renv
 RUN mkdir -p R
 # COPY renv/activate.R /home/rstudio/renv/
 # COPY renv/settings.dcf /home/rstudio/renv/
