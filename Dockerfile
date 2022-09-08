@@ -4,6 +4,7 @@ ENV RENV_VERSION 0.11.0
 RUN R -e "install.packages('remotes',repos=c(CRAN='https://cloud.r-project.org'))"
 RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
+WORKDIR /home/rstudio/
 COPY renv.lock /home/rstudio/
 COPY environment.yml /home/rstudio/
 COPY .Rprofile /home/rstudio/
@@ -30,4 +31,4 @@ COPY R/take_common_genes-function.R /home/rstudio/R/
 COPY R/test_transformer-function.R /home/rstudio/R/
 COPY R/trainer_generator-function.R /home/rstudio/R/
 
-RUN R --vanilla -s -e 'renv::restore()'
+# RUN R --vanilla -s -e 'renv::restore()'
