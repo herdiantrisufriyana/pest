@@ -14,7 +14,7 @@ COPY LICENSE /home/rstudio/
 COPY README.md /home/rstudio/
 COPY pest.Rmd /home/rstudio/
 
-ENV RENV_PATHS_LIBRARY renv/library
+# ENV RENV_PATHS_LIBRARY renv/library
 
 RUN mkdir -p renv
 RUN mkdir -p R
