@@ -11,8 +11,24 @@ COPY environment.yml environment.yml
 ENV RENV_PATHS_LIBRARY renv/library
 
 RUN mkdir -p renv
+RUN mkdir -p R
 COPY .Rprofile .Rprofile
+COPY .gitignore .gitignore
+COPY Dockerfile Dockerfile
+COPY LICENSE LICENSE
+COPY README.md README.md
+COPY pest.rmd pest.rmd
 COPY renv/activate.R renv/activate.R
 COPY renv/settings.dcf renv/settings.dcf
+COPY R/check_install_load-function.R
+COPY R/conduct_dea-function.R
+COPY R/divnn_calibrator_evaluator-function.R
+COPY R/download_annotation-function.R
+COPY R/eval_divnn-function.R
+COPY R/refresh_session-function.R
+COPY R/suspected_outliers-function.R
+COPY R/take_common_genes-function.R
+COPY R/test_transformer-function.R
+COPY R/trainer_generator-function.R
 
 RUN R --vanilla -s -e 'renv::restore()'
