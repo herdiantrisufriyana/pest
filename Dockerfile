@@ -1,4 +1,4 @@
-FROM rocker/verse:4.0.2
+FROM rocker/ml-verse:4.0.2
 
 ENV RENV_VERSION 0.14.0
 RUN R -e "install.packages('remotes',repos=c(CRAN='https://cloud.r-project.org'))"

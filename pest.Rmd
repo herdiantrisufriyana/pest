@@ -46,8 +46,6 @@ if(paste0(version$major,'.',version$minor)!=r_version){
 ```
 
 ```{r Set up reproducible environment, include=FALSE}
-renv::init(restart=F)
-renv::activate()
 renv::restore(prompt=T)
 ```
 
