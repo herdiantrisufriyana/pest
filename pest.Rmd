@@ -38,14 +38,6 @@ always_allow_html: yes
 
 # Set up programming environment
 
-```{r}
-timestamper=c()
-timestamper['0. Pre-start']=format(Sys.time(),'%Y-%m-%d %H:%M:%S')
-
-memstamper=c()
-memstamper['0. Pre-start']=memory.size()
-```
-
 ```{r Stop codes if R version is false}
 r_version='4.0.2'
 if(paste0(version$major,'.',version$minor)!=r_version){
@@ -128,11 +120,6 @@ if(load_trained_divnn){
   reticulate::use_condaenv('./renv/python/condaenvs/renv-python',required=T)
 }
 renv::use_python(name='./renv/python/condaenvs/renv-python')
-```
-
-```{r}
-timestamper['1. Start']=as.character(now())
-memstamper['1. Start']=memory.size()
 ```
 
 # Data load
@@ -925,11 +912,6 @@ data_period %>%
   )
 ```
 
-```{r}
-timestamper['2. Phenotype data']=as.character(now())
-memstamper['2. Phenotype data']=memory.size()
-```
-
 ## Expression data
 
 ```{r Load GSE108497 expression, include=FALSE}
@@ -1327,11 +1309,6 @@ if(run_heavy_computation){
 }
 ```
 
-```{r}
-timestamper['3. Expression data']=as.character(now())
-memstamper['3. Expression data']=memory.size()
-```
-
 ## Feature data
 
 ```{r Download annotation database, eval=FALSE, include=FALSE}
@@ -1509,11 +1486,6 @@ list(GSE108497=fdata$GSE108497$hgnc_symbol
   )
 ```
 
-```{r}
-timestamper['4. Feature data']=as.character(now())
-memstamper['4. Feature data']=memory.size()
-```
-
 # Data preprocessing
 
 ## Removal of technical outliers
@@ -1552,11 +1524,6 @@ if(load_outlier_comp){
     .[intersect(rownames(GPL23159),rownames(.)),] %>%
     suspected_outliers()
 }
-```
-
-```{r}
-timestamper['5. A01 Outlier and low expression removal']=as.character(now())
-memstamper['5. A01 Outlier and low expression removal']=memory.size()
 ```
 
 ```{r Identify outliers of normalized expression by HClust, include=FALSE}
@@ -1633,11 +1600,6 @@ if(load_outlier_comp){
 }
 ```
 
-```{r}
-timestamper['5. A02 Outlier and low expression removal']=as.character(now())
-memstamper['5. A02 Outlier and low expression removal']=memory.size()
-```
-
 ```{r Identify the outliers by both RLE and HClust, include=FALSE}
 if(load_outlier_comp){
   odata$GSE108497=
@@ -1712,11 +1674,6 @@ if(load_outlier_comp){
 }
 ```
 
-```{r}
-timestamper['5. A03 Outlier and low expression removal']=as.character(now())
-memstamper['5. A03 Outlier and low expression removal']=memory.size()
-```
-
 ## Removal of low-expressed probe sets
 
 ```{r Determine transcript-wise medians of expression, include=FALSE}
@@ -1789,11 +1746,6 @@ hist(ldata$GSE177477$row_median,100)
 abline(v=quantile(ldata$GSE177477$row_median,0.2),col=2,lwd=3)
 ```
 
-```{r}
-timestamper['5. A04 Outlier and low expression removal']=as.character(now())
-memstamper['5. A04 Outlier and low expression removal']=memory.size()
-```
-
 ```{r Identify the low-expressed transcripts, include=FALSE}
 ldata$GSE108497$probe=
   ldata$GSE108497$row_median %>%
@@ -1824,11 +1776,6 @@ ldata$GSE177477$probe=
   ldata$GSE177477$row_median %>%
   .[. <= quantile(.,0.2)] %>%
   names()
-```
-
-```{r}
-timestamper['5. Outlier and low expression removal']=as.character(now())
-memstamper['5. Outlier and low expression removal']=memory.size()
 ```
 
 ## Summarization from probe sets to genes
@@ -1947,11 +1894,6 @@ gdata$GSE177477$hgnc=
       arrange(factor(hgnc_symbol,rownames(gdata$GSE177477$filtered))) %>%
       pull(hgnc_symbol)
   )
-```
-
-```{r}
-timestamper['6. Gene summarization']=as.character(now())
-memstamper['6. Gene summarization']=memory.size()
 ```
 
 # Selecting the common genes among all the microarray platforms
@@ -3592,11 +3534,6 @@ GSE177477 %>%
   spread(group,var)
 ```
 
-```{r}
-timestamper['7. Data exploration of common genes']=as.character(now())
-memstamper['7. Data exploration of common genes']=memory.size()
-```
-
 #	Derivation of maternal-fetal interface transcriptome from maternal blood
 
 ```{r Create a list of tissue-pairwise expression sets, include=FALSE}
@@ -3773,11 +3710,6 @@ deg(dea$amnion,'Amnion','outcome',direction=T)
 deg(dea$amnion,'Maternal Blood','feature')
 ```
 
-```{r}
-timestamper['8. Derivation, population-level DEGs']=as.character(now())
-memstamper['8. Derivation, population-level DEGs']=memory.size()
-```
-
 ```{r Compute outcomes of individual DEGs, include=FALSE}
 # Compute the individual DEGs
 outcome=
@@ -3905,11 +3837,6 @@ features=
       AnnotatedDataFrame()
   ) %>%
   pData()
-```
-
-```{r}
-timestamper['9. Derivation, individual-level DEGs']=as.character(now())
-memstamper['9. Derivation, individual-level DEGs']=memory.size()
 ```
 
 ```{r Determine training parameters, include=FALSE}
@@ -5683,7 +5610,7 @@ list(
 ```
 
 ```{r Explore DEGs of all the datasets, include=FALSE}
-tmp0=
+degs_all_datasets=
   list(
     GSE108497=GSE108497_maternal_blood
     ,GSE85307=GSE85307_maternal_blood
@@ -5727,11 +5654,6 @@ tmp0=
       ,'GSE149437'
       ,'GSE108497 and GSE149437')
   )
-```
-
-```{r}
-timestamper['10. Individual DEGs of development dataset']=as.character(now())
-memstamper['10. Individual DEGs of development dataset']=memory.size()
 ```
 
 ```{r Create a function to train a non-DIVNN prediction model, include=FALSE}
@@ -6167,11 +6089,6 @@ if(run_heavy_computation){
   cat(readRDS('data/log.rds')[['pc_gbm3']])
   disease_model3$pc_gbm=readRDS('data/pc_gbm3.rds')
 }
-```
-
-```{r}
-timestamper['11a. Non-DI-VNN model development']=as.character(now())
-memstamper['11a. Non-DI-VNN model development']=memory.size()
 ```
 
 ```{r Create empty lists for DIVNN prediction models, include=FALSE}
@@ -7051,11 +6968,6 @@ if(run_heavy_computation){
 }
 ```
 
-```{r}
-timestamper['11b. DI-VNN model development']=as.character(now())
-memstamper['11b. DI-VNN model development']=memory.size()
-```
-
 ```{r Create a function to compare calibration of the models, include=FALSE}
 source('R/calib_comparison-function.R')
 ```
@@ -7592,7 +7504,7 @@ opt_pred3_disease3$pc_gbm$test_eval$roc
 ```{r Compare the PPVs, include=FALSE}
 ppv_comparison=result_comparison('PREC')
 
-tmp=
+bestmod_ppv=
   ppv_comparison %>%
   filter(tissue!='all') %>%
   filter(model=='pc_gbm' & tissue=='repro') %>%
@@ -7602,7 +7514,7 @@ tmp=
 ```{r Compare the NPVs, include=FALSE}
 npv_comparison=result_comparison('NPV')
 
-tmp2=
+bestmod_npv=
   npv_comparison %>%
   filter(tissue!='all') %>%
   filter(model=='pc_gbm' & tissue=='repro') %>%
@@ -7610,12 +7522,12 @@ tmp2=
 ```
 
 ```{r Show the PPVs and NPVs, echo=FALSE}
-tmp %>%
+bestmod_ppv %>%
   select(set,Score,LB,UB) %>%
   unite(CI,LB,UB,sep=' to ') %>%
   rename_at(c('Score','CI'),paste0,'_PPV') %>%
   left_join(
-    tmp2 %>%
+    bestmod_npv %>%
       select(set,Score,LB,UB) %>%
       unite(CI,LB,UB,sep=' to ') %>%
       rename_at(c('Score','CI'),paste0,'_NPV')
@@ -7630,13 +7542,12 @@ tmp %>%
 ```
 
 ```{r}
-timestamper['12. Model evaluation']=as.character(now())
-memstamper['12. Model evaluation']=memory.size()
+emul=list()
 ```
 
 ```{r Get PC weights from the best model, include=FALSE}
 if(run_heavy_computation){
-  tmp3=
+  bestmod_raw_weights=
     disease_model3$pc_gbm$model %>%
     varImp() %>%
     .[[1]] %>%
@@ -7701,33 +7612,28 @@ if(run_heavy_computation){
       ,by=c('tissue','gene')
     )
   
-  tmp3 %>%
+  bestmod_raw_weights %>%
     pull(tissue) %>%
     .[!duplicated(.)] %>%
     sapply(function(x){
-      tmp3 %>%
+      bestmod_raw_weights %>%
         filter(tissue==x) %>%
-        saveRDS(paste0('data/tmp3_',x,'.rds'))
+        saveRDS(paste0('data/bestmod_raw_weights_',x,'.rds'))
     })
 }else if(show_best_tree){
-  cat(readRDS('data/log.rds')[['tmp3']])
-  tmp3=
-    list.files('data/',pattern='tmp3_',full.names=T) %>%
+  cat(readRDS('data/log.rds')[['bestmod_raw_weights']])
+  bestmod_raw_weights=
+    list.files('data/',pattern='bestmod_raw_weights_',full.names=T) %>%
     lapply(readRDS) %>%
     do.call(rbind,.) %>%
     arrange(term,tissue)
 }
 ```
 
-```{r}
-timestamper['13. A01 Biomarker emulation']=as.character(now())
-memstamper['13. A01 Biomarker emulation']=memory.size()
-```
-
 ```{r Get PC weights from the best model, include=FALSE}
 if(show_best_tree){
-  tmp3b=
-    tmp3 %>%
+  bestmod_weights=
+    bestmod_raw_weights %>%
     group_by(term,tissue,gene,weight,w_direction,mcc,blood_t) %>%
     summarize(accu_w=sum(bt_weight*spc_weight,na.rm=T),n=n()) %>%
     ungroup() %>%
@@ -7745,13 +7651,13 @@ if(show_best_tree){
 # 20 is minimum rank per tissue to include all of them
 # after filtering top 5 in any tissues
 if(run_heavy_computation & show_best_tree){
-  tmp3c=
+  bestmod_list=
     seq(20) %>%
     pblapply(function(x){
       seq(5) %>%
         lapply(X=.,Y=x,function(X,Y){
-          tmp3 %>%
-            left_join(tmp3b,by=c('tissue','blood_t')) %>%
+          bestmod_raw_weights %>%
+            left_join(bestmod_weights,by=c('tissue','blood_t')) %>%
             filter(rank%in%seq(Y)) %>%
             select(tissue,gene,blood_t,avg_accu_w,rank) %>%
             filter(!duplicated(.)) %>%
@@ -7772,39 +7678,34 @@ if(run_heavy_computation & show_best_tree){
         mutate(rank=x)
     }) %>%
     do.call(rbind,.)
-  saveRDS(tmp3c,'data/tmp3c.rds')
+  saveRDS(bestmod_list,'data/bestmod_list.rds')
 }else{
-  cat(readRDS('data/log.rds')[['tmp3c']])
-  tmp3c=readRDS('data/tmp3c.rds')
+  cat(readRDS('data/log.rds')[['bestmod_list']])
+  bestmod_list=readRDS('data/bestmod_list.rds')
 }
 ```
 
 
-```{r}
-timestamper['13. A02 Biomarker emulation']=as.character(now())
-memstamper['13. A02 Biomarker emulation']=memory.size()
-```
-
 ```{r Ensure all tissues included by the criteria, eval=FALSE, include=FALSE}
-tmp3c %>%
+bestmod_list %>%
   group_by(tissue) %>%
   summarize(n=n()) %>%
   mutate(total=sum(n))
 ```
 
 ```{r Show all the combinations, eval=FALSE, include=FALSE}
-tmp3c %>%
+bestmod_list %>%
   pull(rank) %>%
   .[!duplicated(.)] %>%
   sort() %>%
   lapply(function(x){
-    tmp3c %>%
+    bestmod_list %>%
       filter(rank==x) %>%
       pull(grank) %>%
       .[!duplicated(.)] %>%
       sort() %>%
       lapply(X=.,Y=x,function(X,Y){
-        tmp3c %>%
+        bestmod_list %>%
           filter(grank==X & rank==Y) %>%
           unite(tissue_gene_bloodt,tissue,gene,blood_t,sep=':') %>%
           pull(tissue_gene_bloodt) %>%
@@ -7836,16 +7737,11 @@ th_selection=list(c('sens','spec'))
 th_values=list(NULL)
 ```
 
-```{r}
-timestamper['13. A03 Biomarker emulation']=as.character(now())
-memstamper['13. A03 Biomarker emulation']=memory.size()
-```
-
 ```{r Get features to train biomarker tree and evaluate it, include=FALSE}
 if(run_heavy_computation){
   # Preprocess the features per combination in the development dataset
-  tmp3d=
-    tmp3c %>%
+  bestmod_dev=
+    bestmod_list %>%
     pull(rank) %>%
     .[!duplicated(.)] %>%
     sort() %>%
@@ -7864,7 +7760,7 @@ if(run_heavy_computation){
                 ) %>%
                 column_to_rownames(var='id')
              ,function(X,Y){
-      tmp3c %>%
+      bestmod_list %>%
         filter(rank==X) %>%
         pull(grank) %>%
         .[!duplicated(.)] %>%
@@ -7875,13 +7771,13 @@ if(run_heavy_computation){
               'outcome'
               ,paste0(
                 'maternal_blood:'
-                ,tmp3c$blood_t[tmp3c$grank==X & tmp3c$rank==Y]
+                ,bestmod_list$blood_t[bestmod_list$grank==X & bestmod_list$rank==Y]
               )
             ))
         }) %>%
         setNames(paste0(
           'grank'
-          ,tmp3c %>%
+          ,bestmod_list %>%
             filter(rank==X) %>%
             pull(grank) %>%
             .[!duplicated(.)] %>%
@@ -7890,13 +7786,13 @@ if(run_heavy_computation){
     }) %>%
     setNames(paste0(
       'rank'
-      ,tmp3c %>%
+      ,bestmod_list %>%
         pull(rank) %>%
         .[!duplicated(.)] %>%
         sort()
     ))
   
-  saveRDS(tmp3d,'data/tmp3d.rds')
+  saveRDS(bestmod_dev,'data/bestmod_dev.rds')
   
   # Create multiple CPU clusters for parallel computing.
   cl=detectCores()-2
@@ -7921,8 +7817,8 @@ if(run_heavy_computation){
   })
   
   # Train the biomarker tree models
-  tmp3e=
-    tmp3d %>%
+  bestmod_mod=
+    bestmod_dev %>%
     pblapply(X=.
              ,training_parameters=training_parameters
              ,sample.kind=sample.kind
@@ -7974,14 +7870,14 @@ if(run_heavy_computation){
         })
     })
   
-  tmp3e %>%
+  bestmod_mod %>%
     lapply(X=names(.),Y=.,function(X,Y){
-      saveRDS(Y[[X]],paste0('data/tmp3e/tmp3e_',X,'.rds'))
+      saveRDS(Y[[X]],paste0('data/bestmod_mod/bestmod_mod_',X,'.rds'))
     })
   
   # Evaluate the biomarker tree models using development dataset
-  tmp3f=
-    tmp3e %>%
+  bestmod_edev=
+    bestmod_mod %>%
     pblapply(function(x){
       x %>%
         lapply(function(x){
@@ -7992,36 +7888,31 @@ if(run_heavy_computation){
         })
     })
   
-  saveRDS(tmp3f,'data/tmp3f.rds')
+  saveRDS(bestmod_edev,'data/bestmod_edev.rds')
 }else if(load_emulators){
-  cat(readRDS('data/log.rds')[['tmp3d']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3e']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3f']])
-  tmp3d=readRDS('data/tmp3d.rds')
-  tmp3e=
-    list.files('data/tmp3e/',pattern='tmp3e_',full.names=T) %>%
-    .[order(as.numeric(str_remove_all(.,'data/tmp3e/tmp3e_|rank|\\.rds')))] %>%
+  cat(readRDS('data/log.rds')[['bestmod_dev']],'\n')
+  cat(readRDS('data/log.rds')[['bestmod_mod']],'\n')
+  cat(readRDS('data/log.rds')[['bestmod_edev']])
+  bestmod_dev=readRDS('data/bestmod_dev.rds')
+  bestmod_mod=
+    list.files('data/bestmod_mod/',pattern='bestmod_mod_',full.names=T) %>%
+    .[order(as.numeric(str_remove_all(.,'data/bestmod_mod/bestmod_mod_|rank|\\.rds')))] %>%
     lapply(readRDS) %>%
     setNames(
-      list.files('data/tmp3e/',pattern='tmp3e_',full.names=T) %>%
+      list.files('data/bestmod_mod/',pattern='bestmod_mod_',full.names=T) %>%
         .[order(as.numeric(
-          str_remove_all(.,'data/tmp3e/tmp3e_|rank|\\.rds')
+          str_remove_all(.,'data/bestmod_mod/bestmod_mod_|rank|\\.rds')
         ))] %>%
-        str_remove_all('data/tmp3e/tmp3e_|\\.rds')
+        str_remove_all('data/bestmod_mod/bestmod_mod_|\\.rds')
     )
-  tmp3f=readRDS('data/tmp3f.rds')
+  bestmod_edev=readRDS('data/bestmod_edev.rds')
 }
-```
-
-```{r}
-timestamper['13. A04 Biomarker emulation']=as.character(now())
-memstamper['13. A04 Biomarker emulation']=memory.size()
 ```
 
 ```{r Get features of the replication dataset 3 and evaluate it, include=FALSE}
 if(run_heavy_computation){
-  tmp3d2=
-    tmp3c %>%
+  bestmod_rep3=
+    bestmod_list %>%
     pull(rank) %>%
     .[!duplicated(.)] %>%
     sort() %>%
@@ -8038,7 +7929,7 @@ if(run_heavy_computation){
               ) %>%
               column_to_rownames(var='id')
            ,function(X,Y){
-      tmp3c %>%
+      bestmod_list %>%
         filter(rank==X) %>%
         pull(grank) %>%
         .[!duplicated(.)] %>%
@@ -8049,13 +7940,13 @@ if(run_heavy_computation){
               'outcome'
               ,paste0(
                 'maternal_blood:'
-                ,tmp3c$blood_t[tmp3c$grank==X & tmp3c$rank==Y]
+                ,bestmod_list$blood_t[bestmod_list$grank==X & bestmod_list$rank==Y]
               )
             ))
         }) %>%
         setNames(paste0(
           'grank'
-          ,tmp3c %>%
+          ,bestmod_list %>%
             filter(rank==X) %>%
             pull(grank) %>%
             .[!duplicated(.)] %>%
@@ -8064,21 +7955,21 @@ if(run_heavy_computation){
     }) %>%
     setNames(paste0(
       'rank'
-      ,tmp3c %>%
+      ,bestmod_list %>%
         pull(rank) %>%
         .[!duplicated(.)] %>%
         sort()
     ))
   
-  saveRDS(tmp3d2,'data/tmp3d2.rds')
+  saveRDS(bestmod_rep3,'data/bestmod_rep3.rds')
   
-  tmp3f2=
-    tmp3e %>%
+  bestmod_erep3=
+    bestmod_mod %>%
     pblapply(X=names(.),Y=.,function(X,Y){
       Y[[X]] %>%
         lapply(X=names(.),Y=.,Z=X,function(X,Y,Z){
-          tmp3d2[[Z]][[X]] %>%
-            std_no_outlier(tmp3d[[Z]][[X]]) %>%
+          bestmod_rep3[[Z]][[X]] %>%
+            std_no_outlier(bestmod_dev[[Z]][[X]]) %>%
             `colnames<-`(
               str_remove_all(colnames(.),'maternal_blood:')
             ) %>%
@@ -8087,35 +7978,30 @@ if(run_heavy_computation){
         }) %>%
         setNames(names(Y[[X]]))
     }) %>%
-    setNames(names(tmp3e))
+    setNames(names(bestmod_mod))
   
-  saveRDS(tmp3f2,'data/tmp3f2.rds')
+  saveRDS(bestmod_erep3,'data/bestmod_erep3.rds')
 }else if(load_emulators){
-  cat(readRDS('data/log.rds')[['tmp3d2']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3f2']])
-  tmp3d2=readRDS('data/tmp3d2.rds')
-  tmp3f2=readRDS('data/tmp3f2.rds')
+  cat(readRDS('data/log.rds')[['bestmod_rep3']],'\n')
+  cat(readRDS('data/log.rds')[['bestmod_erep3']])
+  bestmod_rep3=readRDS('data/bestmod_rep3.rds')
+  bestmod_erep3=readRDS('data/bestmod_erep3.rds')
 }
 ```
 
-```{r}
-timestamper['13. A05 Biomarker emulation']=as.character(now())
-memstamper['13. A05 Biomarker emulation']=memory.size()
-```
-
 ```{r Check if the combinations are devDEGs, eval=FALSE, include=FALSE}
-tmp3c %>%
+bestmod_list %>%
   pull(rank) %>%
   .[!duplicated(.)] %>%
   sort() %>%
   sapply(function(x){
-    tmp3c %>%
+    bestmod_list %>%
       filter(rank==x) %>%
       pull(grank) %>%
       .[!duplicated(.)] %>%
       sort() %>%
       sapply(X=.,Y=x,function(X,Y){
-        Z=tmp3c$blood_t[tmp3c$grank==X & tmp3c$rank==Y] %>%
+        Z=bestmod_list$blood_t[bestmod_list$grank==X & bestmod_list$rank==Y] %>%
           .[!duplicated(.)]
         K=GSE108497_maternal_blood$result %>%
           filter(adj.P.Val<0.05) %>%
@@ -8124,7 +8010,7 @@ tmp3c %>%
       }) %>%
       setNames(paste0(
         'grank'
-        ,tmp3c %>%
+        ,bestmod_list %>%
           filter(rank==x) %>%
           pull(grank) %>%
           .[!duplicated(.)] %>%
@@ -8133,7 +8019,7 @@ tmp3c %>%
   }) %>%
   `colnames<-`(paste0(
     'rank'
-    ,tmp3c %>%
+    ,bestmod_list %>%
       pull(rank) %>%
       .[!duplicated(.)] %>%
       sort()
@@ -8141,7 +8027,7 @@ tmp3c %>%
 ```
 
 ```{r Check if the best-mod features are devrep3DEGs, eval=FALSE, include=FALSE}
-tmp3$gene %>%
+bestmod_raw_weights$gene %>%
   .[!duplicated(.)] %>%
   intersect(
     GSE108497_maternal_blood$result %>%
@@ -8163,14 +8049,9 @@ tmp3$gene %>%
   )
 ```
 
-```{r}
-timestamper['13. A06 Biomarker emulation']=as.character(now())
-memstamper['13. A06 Biomarker emulation']=memory.size()
-```
-
 ```{r Get features to train logFC2 DEG and evaluate it, include=FALSE}
 # Preprocess the features of logFC2 DEG in the development dataset
-tmp3d3=
+logFC2_dev=
   GSE108497_phenotype %>%
   select(outcome) %>%
   rownames_to_column(var='id') %>%
@@ -8193,7 +8074,7 @@ tmp3d3=
   ))
 
 # Preprocess the features of logFC2 DEG in the replication dataset 3
-tmp3d4=
+logFC2_rep3=
   GSE149437_phenotype %>%
   select(outcome) %>%
   rownames_to_column(var='id') %>%
@@ -8216,8 +8097,8 @@ tmp3d4=
   ))
 
 # Train the logFC2-DEG tree model
-tmp3e3=
-  tmp3d3 %>%
+logFC2_mod=
+  logFC2_dev %>%
   lapply(X=1,Y=.,function(X,Y){
     suppressWarnings(set.seed(33,sample.kind=sample.kind))
     suppressWarnings(
@@ -8263,34 +8144,29 @@ tmp3e3=
   .[[1]]
 
 # Evaluate the logFC2-DEG tree model using development dataset
-tmp3f3=
-  tmp3d3 %>%
-  std_no_outlier(tmp3d3) %>%
+logFC2_edev=
+  logFC2_dev %>%
+  std_no_outlier(logFC2_dev) %>%
   `colnames<-`(
     str_remove_all(colnames(.),'maternal_blood:')
   ) %>%
-  re_evalm(tmp3e3,th_selection,th_values) %>%
+  re_evalm(logFC2_mod,th_selection,th_values) %>%
   column_to_rownames(var='metric')
 
 # Evaluate the logFC2-DEG tree model using replication dataset 3
-tmp3f4=
-  tmp3d4 %>%
-  std_no_outlier(tmp3d3) %>%
+logFC2_erep3=
+  logFC2_rep3 %>%
+  std_no_outlier(logFC2_dev) %>%
   `colnames<-`(
     str_remove_all(colnames(.),'maternal_blood:')
   ) %>%
-  re_evalm(tmp3e3,th_selection,th_values) %>%
+  re_evalm(logFC2_mod,th_selection,th_values) %>%
   column_to_rownames(var='metric')
-```
-
-```{r}
-timestamper['13. A07 Biomarker emulation']=as.character(now())
-memstamper['13. A07 Biomarker emulation']=memory.size()
 ```
 
 ```{r Get features to train devrep3DEG and evaluate it, include=FALSE}
 # Get the possible combinations of devrep3DEG
-tmp3c2=
+devrep3DEG_list=
   GSE108497_maternal_blood$result %>%
   filter(adj.P.Val<0.05) %>%
   rownames() %>%
@@ -8348,7 +8224,7 @@ tmp3c2=
 
 if(run_heavy_computation){
   # Preprocess the features of devrep3DEG in the development dataset
-  tmp3d5=
+  devrep3DEG_dev=
     GSE108497_phenotype %>%
     select(outcome) %>%
     rownames_to_column(var='id') %>%
@@ -8360,7 +8236,7 @@ if(run_heavy_computation){
       ,by='id'
     ) %>%
     column_to_rownames(var='id') %>%
-    pblapply(X=seq(length(tmp3c2)),Y=tmp3c2,Z=.,function(X,Y,Z){
+    pblapply(X=seq(length(devrep3DEG_list)),Y=devrep3DEG_list,Z=.,function(X,Y,Z){
       Z %>%
         select_at(c(
           'outcome'
@@ -8371,10 +8247,10 @@ if(run_heavy_computation){
         ))
     })
   
-  saveRDS(tmp3d5,'data/tmp3d5.rds')
+  saveRDS(devrep3DEG_dev,'data/devrep3DEG_dev.rds')
   
   # Preprocess the features of devrep3DEG in the replication dataset 3
-  tmp3d6=
+  devrep3DEG_rep3=
     GSE149437_phenotype %>%
     select(outcome) %>%
     rownames_to_column(var='id') %>%
@@ -8386,7 +8262,7 @@ if(run_heavy_computation){
       ,by='id'
     ) %>%
     column_to_rownames(var='id') %>%
-    pblapply(X=seq(length(tmp3c2)),Y=tmp3c2,Z=.,function(X,Y,Z){
+    pblapply(X=seq(length(devrep3DEG_list)),Y=devrep3DEG_list,Z=.,function(X,Y,Z){
       Z %>%
         select_at(c(
           'outcome'
@@ -8397,7 +8273,7 @@ if(run_heavy_computation){
         ))
     })
   
-  saveRDS(tmp3d6,'data/tmp3d6.rds')
+  saveRDS(devrep3DEG_rep3,'data/devrep3DEG_rep3.rds')
   
   # Create multiple CPU clusters for parallel computing.
   cl=detectCores()-2
@@ -8422,8 +8298,8 @@ if(run_heavy_computation){
   })
   
   # Train the devrep3DEG tree model
-  tmp3e5=
-    tmp3d5 %>%
+  devrep3DEG_mod=
+    devrep3DEG_dev %>%
     pblapply(X=.
              ,training_parameters=training_parameters
              ,sample.kind=sample.kind
@@ -8472,17 +8348,17 @@ if(run_heavy_computation){
       )
     })
   
-  tmp3e5 %>%
+  devrep3DEG_mod %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
-      saveRDS(Y[[X]],paste0('data/tmp3e5/tmp3e5_',X,'.rds'))
+      saveRDS(Y[[X]],paste0('data/devrep3DEG_mod/devrep3DEG_mod_',X,'.rds'))
     })
   
   # Evaluate the devrep3DEG tree model using development dataset
-  tmp3f5=
-    tmp3e5 %>%
+  devrep3DEG_edev=
+    devrep3DEG_mod %>%
     pblapply(X=seq(length(.)),Y=.,function(X,Y){
-      tmp3d5[[X]] %>%
-        std_no_outlier(tmp3d5[[X]]) %>%
+      devrep3DEG_dev[[X]] %>%
+        std_no_outlier(devrep3DEG_dev[[X]]) %>%
         `colnames<-`(
           str_remove_all(colnames(.),'maternal_blood:')
         ) %>%
@@ -8490,14 +8366,14 @@ if(run_heavy_computation){
         column_to_rownames(var='metric')
     })
   
-  saveRDS(tmp3f5,'data/tmp3f5.rds')
+  saveRDS(devrep3DEG_edev,'data/devrep3DEG_edev.rds')
   
   # Evaluate the devrep3DEG tree model using replication dataset 3
-  tmp3f6=
-    tmp3e5 %>%
+  devrep3DEG_erep3=
+    devrep3DEG_mod %>%
     pblapply(X=seq(length(.)),Y=.,function(X,Y){
-      tmp3d6[[X]] %>%
-        std_no_outlier(tmp3d5[[X]]) %>%
+      devrep3DEG_rep3[[X]] %>%
+        std_no_outlier(devrep3DEG_dev[[X]]) %>%
         `colnames<-`(
           str_remove_all(colnames(.),'maternal_blood:')
         ) %>%
@@ -8505,34 +8381,29 @@ if(run_heavy_computation){
         column_to_rownames(var='metric')
     })
   
-  saveRDS(tmp3f6,'data/tmp3f6.rds')
+  saveRDS(devrep3DEG_erep3,'data/devrep3DEG_erep3.rds')
 }else if(load_emulators){
-  cat(readRDS('data/log.rds')[['tmp3d5']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3d6']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3e5']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3f5']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3f6']])
-  tmp3d5=readRDS('data/tmp3d5.rds')
-  tmp3d6=readRDS('data/tmp3d6.rds')
-  tmp3e5=
-    list.files('data/tmp3e5/',pattern='tmp3e5_',full.names=T) %>%
+  cat(readRDS('data/log.rds')[['devrep3DEG_dev']],'\n')
+  cat(readRDS('data/log.rds')[['devrep3DEG_rep3']],'\n')
+  cat(readRDS('data/log.rds')[['devrep3DEG_mod']],'\n')
+  cat(readRDS('data/log.rds')[['devrep3DEG_edev']],'\n')
+  cat(readRDS('data/log.rds')[['devrep3DEG_erep3']])
+  devrep3DEG_dev=readRDS('data/devrep3DEG_dev.rds')
+  devrep3DEG_rep3=readRDS('data/devrep3DEG_rep3.rds')
+  devrep3DEG_mod=
+    list.files('data/devrep3DEG_mod/',pattern='devrep3DEG_mod_',full.names=T) %>%
     .[order(as.numeric(
-      str_remove_all(.,'data/tmp3e5/tmp3e5_|rank|\\.rds')
+      str_remove_all(.,'data/devrep3DEG_mod/devrep3DEG_mod_|rank|\\.rds')
     ))] %>%
     lapply(readRDS)
-  tmp3f5=readRDS('data/tmp3f5.rds')
-  tmp3f6=readRDS('data/tmp3f6.rds')
+  devrep3DEG_edev=readRDS('data/devrep3DEG_edev.rds')
+  devrep3DEG_erep3=readRDS('data/devrep3DEG_erep3.rds')
 }
-```
-
-```{r}
-timestamper['13. A08 Biomarker emulation']=as.character(now())
-memstamper['13. A08 Biomarker emulation']=memory.size()
 ```
 
 ```{r Get features to train devnorep3DEG and evaluate it, include=FALSE}
 # Get the possible combinations of devnorep3DEG
-tmp3c3=
+devnorep3DEG_list=
   GSE108497_maternal_blood$result %>%
   filter(adj.P.Val<0.05) %>%
   rownames() %>%
@@ -8590,7 +8461,7 @@ tmp3c3=
 
 if(run_heavy_computation){
   # Preprocess the features of devnorep3DEG in the development dataset
-  tmp3d7=
+  devnorep3DEG_dev=
     GSE108497_phenotype %>%
     select(outcome) %>%
     rownames_to_column(var='id') %>%
@@ -8603,7 +8474,7 @@ if(run_heavy_computation){
       ,by='id'
     ) %>%
     column_to_rownames(var='id') %>%
-    pblapply(X=seq(length(tmp3c3)),Y=tmp3c3,Z=.,function(X,Y,Z){
+    pblapply(X=seq(length(devnorep3DEG_list)),Y=devnorep3DEG_list,Z=.,function(X,Y,Z){
       Z %>%
         select_at(c(
           'outcome'
@@ -8614,10 +8485,10 @@ if(run_heavy_computation){
         ))
     })
   
-  saveRDS(tmp3d7,'data/tmp3d7.rds')
+  saveRDS(devnorep3DEG_dev,'data/devnorep3DEG_dev.rds')
   
   # Preprocess the features of devnorep3DEG in the replication dataset 3
-  tmp3d8=
+  devnorep3DEG_rep3=
     GSE149437_phenotype %>%
     select(outcome) %>%
     rownames_to_column(var='id') %>%
@@ -8630,7 +8501,7 @@ if(run_heavy_computation){
       ,by='id'
     ) %>%
     column_to_rownames(var='id') %>%
-    pblapply(X=seq(length(tmp3c3)),Y=tmp3c3,Z=.,function(X,Y,Z){
+    pblapply(X=seq(length(devnorep3DEG_list)),Y=devnorep3DEG_list,Z=.,function(X,Y,Z){
       Z %>%
         select_at(c(
           'outcome'
@@ -8641,7 +8512,7 @@ if(run_heavy_computation){
         ))
     })
   
-  saveRDS(tmp3d8,'data/tmp3d8.rds')
+  saveRDS(devnorep3DEG_rep3,'data/devnorep3DEG_rep3.rds')
   
   # Create multiple CPU clusters for parallel computing.
   cl=detectCores()-2
@@ -8666,8 +8537,8 @@ if(run_heavy_computation){
   })
   
   # Train the devnorep3DEG tree model
-  tmp3e7=
-    tmp3d7 %>%
+  devnorep3DEG_mod=
+    devnorep3DEG_dev %>%
     pblapply(X=.
              ,training_parameters=training_parameters
              ,sample.kind=sample.kind
@@ -8716,17 +8587,17 @@ if(run_heavy_computation){
       )
     })
   
-  tmp3e7 %>%
+  devnorep3DEG_mod %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
-      saveRDS(Y[[X]],paste0('data/tmp3e7/tmp3e7_',X,'.rds'))
+      saveRDS(Y[[X]],paste0('data/devnorep3DEG_mod/devnorep3DEG_mod_',X,'.rds'))
     })
   
   # Evaluate the devnorep3DEG tree model using development dataset
-  tmp3f7=
-    tmp3e7 %>%
+  devnorep3DEG_edev=
+    devnorep3DEG_mod %>%
     pblapply(X=seq(length(.)),Y=.,function(X,Y){
-      tmp3d7[[X]] %>%
-        std_no_outlier(tmp3d7[[X]]) %>%
+      devnorep3DEG_dev[[X]] %>%
+        std_no_outlier(devnorep3DEG_dev[[X]]) %>%
         `colnames<-`(
           str_remove_all(colnames(.),'maternal_blood:')
         ) %>%
@@ -8734,14 +8605,14 @@ if(run_heavy_computation){
         column_to_rownames(var='metric')
     })
   
-  saveRDS(tmp3f7,'data/tmp3f7.rds')
+  saveRDS(devnorep3DEG_edev,'data/devnorep3DEG_edev.rds')
   
   # Evaluate the devnorep3DEG tree model using replication dataset 3
-  tmp3f8=
-    tmp3e7 %>%
+  devnorep3DEG_erep3=
+    devnorep3DEG_mod %>%
     pblapply(X=seq(length(.)),Y=.,function(X,Y){
-      tmp3d8[[X]] %>%
-        std_no_outlier(tmp3d7[[X]]) %>%
+      devnorep3DEG_rep3[[X]] %>%
+        std_no_outlier(devnorep3DEG_dev[[X]]) %>%
         `colnames<-`(
           str_remove_all(colnames(.),'maternal_blood:')
         ) %>%
@@ -8749,34 +8620,29 @@ if(run_heavy_computation){
         column_to_rownames(var='metric')
     })
   
-  saveRDS(tmp3f8,'data/tmp3f8.rds')
+  saveRDS(devnorep3DEG_erep3,'data/devnorep3DEG_erep3.rds')
 }else if(load_emulators){
-  cat(readRDS('data/log.rds')[['tmp3d7']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3d8']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3e7']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3f7']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3f8']])
-  tmp3d7=readRDS('data/tmp3d7.rds')
-  tmp3d8=readRDS('data/tmp3d8.rds')
-  tmp3e7=
-    list.files('data/tmp3e7/',pattern='tmp3e7_',full.names=T) %>%
+  cat(readRDS('data/log.rds')[['devnorep3DEG_dev']],'\n')
+  cat(readRDS('data/log.rds')[['devnorep3DEG_rep3']],'\n')
+  cat(readRDS('data/log.rds')[['devnorep3DEG_mod']],'\n')
+  cat(readRDS('data/log.rds')[['devnorep3DEG_edev']],'\n')
+  cat(readRDS('data/log.rds')[['devnorep3DEG_erep3']])
+  devnorep3DEG_dev=readRDS('data/devnorep3DEG_dev.rds')
+  devnorep3DEG_rep3=readRDS('data/devnorep3DEG_rep3.rds')
+  devnorep3DEG_mod=
+    list.files('data/devnorep3DEG_mod/',pattern='devnorep3DEG_mod_',full.names=T) %>%
     .[order(as.numeric(
-      str_remove_all(.,'data/tmp3e7/tmp3e7_|rank|\\.rds')
+      str_remove_all(.,'data/devnorep3DEG_mod/devnorep3DEG_mod_|rank|\\.rds')
     ))] %>%
     lapply(readRDS)
-  tmp3f7=readRDS('data/tmp3f7.rds')
-  tmp3f8=readRDS('data/tmp3f8.rds')
+  devnorep3DEG_edev=readRDS('data/devnorep3DEG_edev.rds')
+  devnorep3DEG_erep3=readRDS('data/devnorep3DEG_erep3.rds')
 }
-```
-
-```{r}
-timestamper['13. A09 Biomarker emulation']=as.character(now())
-memstamper['13. A09 Biomarker emulation']=memory.size()
 ```
 
 ```{r Get features to train recentDEG and evaluate it, include=FALSE}
 # Get the possible combinations of recentDEG
-tmp3c4=
+recentDEG_list=
   c('CAMK2G'
     ,'DERA'
     ,'FAM46A'
@@ -8848,7 +8714,7 @@ tmp3c4=
 
 if(run_heavy_computation){
   # Preprocess the features of recentDEG in the development dataset
-  tmp3d9=
+  recentDEG_dev=
     GSE108497_phenotype %>%
     select(outcome) %>%
     rownames_to_column(var='id') %>%
@@ -8861,7 +8727,7 @@ if(run_heavy_computation){
       ,by='id'
     ) %>%
     column_to_rownames(var='id') %>%
-    pblapply(X=seq(length(tmp3c4)),Y=tmp3c4,Z=.,function(X,Y,Z){
+    pblapply(X=seq(length(recentDEG_list)),Y=recentDEG_list,Z=.,function(X,Y,Z){
       Z %>%
         select_at(c(
           'outcome'
@@ -8872,10 +8738,10 @@ if(run_heavy_computation){
         ))
     })
   
-  saveRDS(tmp3d9,'data/tmp3d9.rds')
+  saveRDS(recentDEG_dev,'data/recentDEG_dev.rds')
   
   # Preprocess the features of recentDEG in the replication dataset 3
-  tmp3d10=
+  recentDEG_rep3=
     GSE149437_phenotype %>%
     select(outcome) %>%
     rownames_to_column(var='id') %>%
@@ -8888,7 +8754,7 @@ if(run_heavy_computation){
       ,by='id'
     ) %>%
     column_to_rownames(var='id') %>%
-    pblapply(X=seq(length(tmp3c4)),Y=tmp3c4,Z=.,function(X,Y,Z){
+    pblapply(X=seq(length(recentDEG_list)),Y=recentDEG_list,Z=.,function(X,Y,Z){
       Z %>%
         select_at(c(
           'outcome'
@@ -8899,7 +8765,7 @@ if(run_heavy_computation){
         ))
     })
   
-  saveRDS(tmp3d10,'data/tmp3d10.rds')
+  saveRDS(recentDEG_rep3,'data/recentDEG_rep3.rds')
   
   # Create multiple CPU clusters for parallel computing.
   cl=detectCores()-2
@@ -8924,8 +8790,8 @@ if(run_heavy_computation){
   })
   
   # Train the recentDEG tree model
-  tmp3e9=
-    tmp3d9 %>%
+  recentDEG_mod=
+    recentDEG_dev %>%
     pblapply(X=.
              ,training_parameters=training_parameters
              ,sample.kind=sample.kind
@@ -8974,17 +8840,17 @@ if(run_heavy_computation){
       )
     })
   
-  tmp3e9 %>%
+  recentDEG_mod %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
-      saveRDS(Y[[X]],paste0('data/tmp3e9/tmp3e9_',X,'.rds'))
+      saveRDS(Y[[X]],paste0('data/recentDEG_mod/recentDEG_mod_',X,'.rds'))
     })
   
   # Evaluate the recentDEG tree model using development dataset
-  tmp3f9=
-    tmp3e9 %>%
+  recentDEG_edev=
+    recentDEG_mod %>%
     pblapply(X=seq(length(.)),Y=.,function(X,Y){
-      tmp3d9[[X]] %>%
-        std_no_outlier(tmp3d9[[X]]) %>%
+      recentDEG_dev[[X]] %>%
+        std_no_outlier(recentDEG_dev[[X]]) %>%
         `colnames<-`(
           str_remove_all(colnames(.),'maternal_blood:')
         ) %>%
@@ -8992,14 +8858,14 @@ if(run_heavy_computation){
         column_to_rownames(var='metric')
     })
   
-  saveRDS(tmp3f9,'data/tmp3f9.rds')
+  saveRDS(recentDEG_edev,'data/recentDEG_edev.rds')
   
   # Evaluate the recentDEG tree model using replication dataset 3
-  tmp3f10=
-    tmp3e9 %>%
+  recentDEG_erep3=
+    recentDEG_mod %>%
     pblapply(X=seq(length(.)),Y=.,function(X,Y){
-      tmp3d10[[X]] %>%
-        std_no_outlier(tmp3d9[[X]]) %>%
+      recentDEG_rep3[[X]] %>%
+        std_no_outlier(recentDEG_dev[[X]]) %>%
         `colnames<-`(
           str_remove_all(colnames(.),'maternal_blood:')
         ) %>%
@@ -9007,23 +8873,23 @@ if(run_heavy_computation){
         column_to_rownames(var='metric')
     })
   
-  saveRDS(tmp3f10,'data/tmp3f10.rds')
+  saveRDS(recentDEG_erep3,'data/recentDEG_erep3.rds')
 }else if(load_emulators){
-  cat(readRDS('data/log.rds')[['tmp3d9']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3d10']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3e9']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3f9']],'\n')
-  cat(readRDS('data/log.rds')[['tmp3f10']])
-  tmp3d9=readRDS('data/tmp3d9.rds')
-  tmp3d10=readRDS('data/tmp3d10.rds')
-  tmp3e9=
-    list.files('data/tmp3e9/',pattern='tmp3e9_',full.names=T) %>%
+  cat(readRDS('data/log.rds')[['recentDEG_dev']],'\n')
+  cat(readRDS('data/log.rds')[['recentDEG_rep3']],'\n')
+  cat(readRDS('data/log.rds')[['recentDEG_mod']],'\n')
+  cat(readRDS('data/log.rds')[['recentDEG_edev']],'\n')
+  cat(readRDS('data/log.rds')[['recentDEG_erep3']])
+  recentDEG_dev=readRDS('data/recentDEG_dev.rds')
+  recentDEG_rep3=readRDS('data/recentDEG_rep3.rds')
+  recentDEG_mod=
+    list.files('data/recentDEG_mod/',pattern='recentDEG_mod_',full.names=T) %>%
     .[order(as.numeric(
-      str_remove_all(.,'data/tmp3e9/tmp3e9_|rank|\\.rds')
+      str_remove_all(.,'data/recentDEG_mod/recentDEG_mod_|rank|\\.rds')
     ))] %>%
     lapply(readRDS)
-  tmp3f9=readRDS('data/tmp3f9.rds')
-  tmp3f10=readRDS('data/tmp3f10.rds')
+  recentDEG_edev=readRDS('data/recentDEG_edev.rds')
+  recentDEG_erep3=readRDS('data/recentDEG_erep3.rds')
 }
 ```
 
@@ -9031,131 +8897,121 @@ if(run_heavy_computation){
 source('R/get_auroc-function.R')
 ```
 
-```{r}
-timestamper['13. A10 Biomarker emulation']=as.character(now())
-memstamper['13. A10 Biomarker emulation']=memory.size()
-```
-
 ```{r Compute AUROCs for all the methods of predictor discovery, include=FALSE}
 if(run_heavy_computation){
-  tmp3g=list()
+  emul_aurocs=list()
   
-  tmp3g$tmp3e$train=
-    tmp3d %>%
-    get_auroc(tmp3e)
+  emul_aurocs$bestmod_mod$train=
+    bestmod_dev %>%
+    get_auroc(bestmod_mod)
   
-  tmp3g$tmp3e$test=
-    tmp3d2 %>%
-    get_auroc(tmp3e)
+  emul_aurocs$bestmod_mod$test=
+    bestmod_rep3 %>%
+    get_auroc(bestmod_mod)
   
-  tmp3g$tmp3e3$train=
-    list(ext=list(reme=tmp3d3)) %>%
-    get_auroc(list(ext=list(reme=tmp3e3)))
+  emul_aurocs$logFC2_mod$train=
+    list(ext=list(reme=logFC2_dev)) %>%
+    get_auroc(list(ext=list(reme=logFC2_mod)))
   
-  tmp3g$tmp3e3$test=
-    list(ext=list(reme=tmp3d4)) %>%
-    get_auroc(list(ext=list(reme=tmp3e3)))
+  emul_aurocs$logFC2_mod$test=
+    list(ext=list(reme=logFC2_rep3)) %>%
+    get_auroc(list(ext=list(reme=logFC2_mod)))
   
-  tmp3g$tmp3e5$train=
-    tmp3d5 %>%
+  emul_aurocs$devrep3DEG_mod$train=
+    devrep3DEG_dev %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
       list(both=Y[[X]])
     }) %>%
     setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0'))) %>%
     get_auroc(
-      tmp3e5 %>%
+      devrep3DEG_mod %>%
         lapply(X=seq(length(.)),Y=.,function(X,Y){
           list(both=Y[[X]])
         }) %>%
         setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0')))
     )
   
-  tmp3g$tmp3e5$test=
-    tmp3d6 %>%
+  emul_aurocs$devrep3DEG_mod$test=
+    devrep3DEG_rep3 %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
       list(both=Y[[X]])
     }) %>%
     setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0'))) %>%
     get_auroc(
-      tmp3e5 %>%
+      devrep3DEG_mod %>%
         lapply(X=seq(length(.)),Y=.,function(X,Y){
           list(both=Y[[X]])
         }) %>%
         setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0')))
     )
   
-  tmp3g$tmp3e7$train=
-    tmp3d7 %>%
+  emul_aurocs$devnorep3DEG_mod$train=
+    devnorep3DEG_dev %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
       list(not_in=Y[[X]])
     }) %>%
     setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0'))) %>%
     get_auroc(
-      tmp3e7 %>%
+      devnorep3DEG_mod %>%
         lapply(X=seq(length(.)),Y=.,function(X,Y){
           list(not_in=Y[[X]])
         }) %>%
         setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0')))
     )
   
-  tmp3g$tmp3e7$test=
-    tmp3d8 %>%
+  emul_aurocs$devnorep3DEG_mod$test=
+    devnorep3DEG_rep3 %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
       list(not_in=Y[[X]])
     }) %>%
     setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0'))) %>%
     get_auroc(
-      tmp3e7 %>%
+      devnorep3DEG_mod %>%
         lapply(X=seq(length(.)),Y=.,function(X,Y){
           list(not_in=Y[[X]])
         }) %>%
         setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0')))
     )
   
-  tmp3g$tmp3e9$train=
-    tmp3d9 %>%
+  emul_aurocs$recentDEG_mod$train=
+    recentDEG_dev %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
       list(recent=Y[[X]])
     }) %>%
     setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0'))) %>%
     get_auroc(
-      tmp3e9 %>%
+      recentDEG_mod %>%
         lapply(X=seq(length(.)),Y=.,function(X,Y){
           list(recent=Y[[X]])
         }) %>%
         setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0')))
     )
   
-  tmp3g$tmp3e9$test=
-    tmp3d10 %>%
+  emul_aurocs$recentDEG_mod$test=
+    recentDEG_rep3 %>%
     lapply(X=seq(length(.)),Y=.,function(X,Y){
       list(recent=Y[[X]])
     }) %>%
     setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0'))) %>%
     get_auroc(
-      tmp3e9 %>%
+      recentDEG_mod %>%
         lapply(X=seq(length(.)),Y=.,function(X,Y){
           list(recent=Y[[X]])
         }) %>%
         setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0')))
     )
   
-  saveRDS(tmp3g,'data/tmp3g.rds')
+  saveRDS(emul_aurocs,'data/emul_aurocs.rds')
 }else{
-  cat(readRDS('data/log.rds')[['tmp3g']])
-  tmp3g=readRDS('data/tmp3g.rds')
+  cat(readRDS('data/log.rds')[['emul_aurocs']])
+  emul_aurocs=readRDS('data/emul_aurocs.rds')
 }
-```
-
-```{r}
-timestamper['13. A11 Biomarker emulation']=as.character(now())
-memstamper['13. A11 Biomarker emulation']=memory.size()
 ```
 
 ```{r Summarize the AUROC comparison for the predictor discovery, include=FALSE}
 if(run_heavy_computation){
-  tmp3h=
-    tmp3g %>%
+  sum_aurocs=
+    emul_aurocs %>%
     lapply(X=names(.),Y=.,function(X,Y){
       Y[[X]] %>%
         lapply(X=names(.),Y=.,function(X,Y){
@@ -9207,24 +9063,24 @@ if(run_heavy_computation){
         column_to_rownames(var='id')
       
       K=list(
-          tmp3e=
-            tmp3e
-          ,tmp3e3=
-            list(ext=list(reme=tmp3e3))
-          ,tmp3e5=
-            tmp3e5 %>%
+          bestmod_mod=
+            bestmod_mod
+          ,logFC2_mod=
+            list(ext=list(reme=logFC2_mod))
+          ,devrep3DEG_mod=
+            devrep3DEG_mod %>%
             lapply(X=seq(length(.)),Y=.,function(X,Y){
               list(both=Y[[X]])
             }) %>%
             setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0')))
-          ,tmp3e7=
-            tmp3e7 %>%
+          ,devnorep3DEG_mod=
+            devnorep3DEG_mod %>%
             lapply(X=seq(length(.)),Y=.,function(X,Y){
               list(not_in=Y[[X]])
             }) %>%
             setNames(paste0('mod',str_pad(seq(length(.)),3,'left','0')))
-          ,tmp3e9=
-            tmp3e9 %>%
+          ,recentDEG_mod=
+            recentDEG_mod %>%
             lapply(X=seq(length(.)),Y=.,function(X,Y){
               list(recent=Y[[X]])
             }) %>%
@@ -9276,16 +9132,11 @@ if(run_heavy_computation){
     }) %>%
     .[[1]]
   
-  saveRDS(tmp3h,'data/tmp3h.rds')
+  saveRDS(sum_aurocs,'data/sum_aurocs.rds')
 }else{
-  cat(readRDS('data/log.rds')[['tmp3h']])
-  tmp3h=readRDS('data/tmp3h.rds')
+  cat(readRDS('data/log.rds')[['sum_aurocs']])
+  sum_aurocs=readRDS('data/sum_aurocs.rds')
 }
-```
-
-```{r}
-timestamper['13. A12 Biomarker emulation']=as.character(now())
-memstamper['13. A12 Biomarker emulation']=memory.size()
 ```
 
 ```{r Show outcomes of the COVID-19 dataset, eval=FALSE, include=FALSE}
@@ -9328,8 +9179,8 @@ GSE177477_phenotype %>%
 ```
 
 ```{r Assess the eligibility of the emulated biomarkers, include=FALSE}
-tmp3i=
-  tmp3h %>%
+eligible_biomarkers=
+  sum_aurocs %>%
   mutate(
     pred_avail=predictors!=''
     ,replicable=Score_test>=LB_train & Score_test<=UB_train
@@ -9356,12 +9207,12 @@ tmp3i=
 ```
 
 ```{r Conduct permutation tests to predictor discovery methods, include=FALSE}
-tmp3i %>%
+eligible_biomarkers %>%
   mutate(
     mod_list=
       ifelse(
-        mod_list%in%c('tmp3e3','tmp3e7')
-        ,mod_list#'tmp3e37'
+        mod_list%in%c('logFC2_mod','devnorep3DEG_mod')
+        ,mod_list#'logFC2_mod_devnorep3DEG_mod'
         ,mod_list
       )
   ) %>%
@@ -9431,27 +9282,22 @@ tmp3i %>%
   mutate(
     mod_list=
       case_when(
-        mod_list=='tmp3e'~'blood-derived surrogate transcriptome'
-        ,mod_list=='tmp3e3'~'blood transcriptome, p.val<.05 & abs(logFC)>2'
-        ,mod_list=='tmp3e5'~'blood transcriptome, p.val<.05 both train & test'
-        ,mod_list=='tmp3e7'~'blood transcriptome, p.val<.05 train but not test'
-        ,mod_list=='tmp3e9'~'blood transcriptome, a recent study'
-        ,mod_list=='tmp3e37'~'blood transcriptome, p.val<.05 train but not test'
+        mod_list=='bestmod_mod'~'blood-derived surrogate transcriptome'
+        ,mod_list=='logFC2_mod'~'blood transcriptome, p.val<.05 & abs(logFC)>2'
+        ,mod_list=='devrep3DEG_mod'~'blood transcriptome, p.val<.05 both train & test'
+        ,mod_list=='devnorep3DEG_mod'~'blood transcriptome, p.val<.05 train but not test'
+        ,mod_list=='recentDEG_mod'~'blood transcriptome, a recent study'
+        ,mod_list=='logFC2_mod_devnorep3DEG_mod'~'blood transcriptome, p.val<.05 train but not test'
         ,TRUE~''
       )
   )
 ```
 
-```{r}
-timestamper['13. A13 Biomarker emulation']=as.character(now())
-memstamper['13. A13 Biomarker emulation']=memory.size()
-```
-
 ```{r Get the best tree from the best method of discovery, include=FALSE}
 if(load_emulators){
-  tmp3j=
-    tmp3i %>%
-    filter(quality=='high' & mod_list=='tmp3e') %>%
+  best_each_method=
+    eligible_biomarkers %>%
+    filter(quality=='high' & mod_list=='bestmod_mod') %>%
     arrange(desc(LB_train),desc(Score_test),LB_covid,level1,level2) %>%
     slice(1) %>%
     unite(id,level1,level2,sep='.') %>%
@@ -9459,10 +9305,10 @@ if(load_emulators){
     lapply(function(x){
       y=str_split(x,'\\.')[[1]]
       list(
-        mod=tmp3e[[y[1]]][[y[2]]]
-        ,eval=tmp3f[[y[1]]][[y[2]]]
-        ,train=tmp3d[[y[1]]][[y[2]]]
-        ,test=tmp3d2[[y[1]]][[y[2]]]
+        mod=bestmod_mod[[y[1]]][[y[2]]]
+        ,eval=bestmod_edev[[y[1]]][[y[2]]]
+        ,train=bestmod_dev[[y[1]]][[y[2]]]
+        ,test=bestmod_rep3[[y[1]]][[y[2]]]
         ,covid=
           GSE177477_phenotype %>%
           select(outcome) %>%
@@ -9499,26 +9345,21 @@ if(load_emulators){
           ) %>%
           select(-symptons,-severity) %>%
           column_to_rownames(var='id') %>%
-          select_at(colnames(tmp3d[[y[1]]][[y[2]]]))
+          select_at(colnames(bestmod_dev[[y[1]]][[y[2]]]))
       )
     }) %>%
     .[[1]]
   
-  saveRDS(tmp3j,'data/tmp3j.rds')
+  saveRDS(best_each_method,'data/best_each_method.rds')
 }else{
-  tmp3j=readRDS('data/tmp3j.rds')
+  best_each_method=readRDS('data/best_each_method.rds')
 }
-```
-
-```{r}
-timestamper['13. A14 Biomarker emulation']=as.character(now())
-memstamper['13. A14 Biomarker emulation']=memory.size()
 ```
 
 ```{r Candidate and selected predictors of biomarker trees, include=FALSE}
 if(load_emulators){
-  tmp3k=
-    tmp3d %>%
+  bestmod_biomarkers=
+    bestmod_dev %>%
     pblapply(function(x){
       x %>%
         lapply(function(x){
@@ -9550,27 +9391,22 @@ if(load_emulators){
           ),]
         })
     }) %>%
-    get_auroc(tmp3e)
+    get_auroc(bestmod_mod)
   
-  saveRDS(tmp3k,'data/tmp3k.rds')
+  saveRDS(bestmod_biomarkers,'data/bestmod_biomarkers.rds')
 }else{
-  tmp3k=readRDS('data/tmp3k.rds')
+  bestmod_biomarkers=readRDS('data/bestmod_biomarkers.rds')
 }
 ```
 
-```{r}
-timestamper['13. A15 Biomarker emulation']=as.character(now())
-memstamper['13. A15 Biomarker emulation']=memory.size()
-```
-
 ```{r Candidate and selected predictors of the best biomarker trees, echo=FALSE}
-tmp3h %>%
-  filter(mod_list=='tmp3e') %>%
+sum_aurocs %>%
+  filter(mod_list=='bestmod_mod') %>%
   .[,
     colnames(.) %>% .[!.%in%paste0(c('Score','LB','UB'),'_test')]
   ] %>%
   left_join(
-    tmp3k %>%
+    bestmod_biomarkers %>%
       separate(id,c('level1','level2'),sep='\\.') %>%
       rename_at(c('Score','LB','UB'),paste0,'_test')
     ,by=c('level1','level2','cand_predictor','predictors')
@@ -9603,12 +9439,12 @@ tmp3h %>%
 
 ```{r The best biomarkers, echo=FALSE, fig.height=3.46457, fig.width=3.46457}
 if(load_emulators){
-  saveRDS(tmp3e$rank2$grank3,'data/tmp3e_rank2_grank3.rds')
+  saveRDS(bestmod_mod$rank2$grank3,'data/best_biomarkers_mod.rds')
 }else{
-  tmp3e_rank2_grank3=readRDS('data/tmp3e_rank2_grank3.rds')
+  best_biomarkers_mod=readRDS('data/best_biomarkers_mod.rds')
 }
 
-tmp3e_rank2_grank3 %>%
+best_biomarkers_mod %>%
   .$finalModel %>%
   rpart.plot(
     type=5
@@ -9626,12 +9462,12 @@ tmp3e_rank2_grank3 %>%
 
 ```{r Show averages and SDs to scale the biomarkers, eval=FALSE, include=FALSE}
 if(load_emulators){
-  saveRDS(tmp3d$rank2$grank3,'data/tmp3d_rank2_grank3.rds')
+  saveRDS(bestmod_dev$rank2$grank3,'data/best_biomarkers_dev.rds')
 }else{
-  tmp3d_rank2_grank3=readRDS('data/tmp3d_rank2_grank3.rds')
+  best_biomarkers_dev=readRDS('data/best_biomarkers_dev.rds')
 }
 
-tmp3d_rank2_grank3 %>%
+best_biomarkers_dev %>%
   select(-outcome) %>%
   lapply(X=colnames(.),Y=.,function(X,Y){
     median=quantile(Y[[X]],0.5)
@@ -9655,18 +9491,13 @@ tmp3d_rank2_grank3 %>%
   do.call(rbind,.)
 ```
 
-```{r}
-timestamper['13. A16 Biomarker emulation']=as.character(now())
-memstamper['13. A16 Biomarker emulation']=memory.size()
-```
-
 ```{r Create a function to evaluate leaves of a biomarker tree, include=FALSE}
 source('R/tree_eval-function.R')
 ```
 
 ```{r The best tree (training), echo=FALSE, fig.height=3.5, fig.width=3.5}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -9681,16 +9512,16 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$trainingData %>%
     rename(outcome=.outcome) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The best tree (COVID-19), echo=FALSE, fig.height=3.5, fig.width=3.5}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -9705,23 +9536,23 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$covid %>%
+  best_each_method$covid %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The surrogate transcriptome in the best model (within ranks), echo=FALSE}
 if(show_best_tree){
-  tmp3c %>%
+  bestmod_list %>%
     filter(
       blood_t
       %in%str_split(
-        tmp3i %>%
+        eligible_biomarkers %>%
           filter(
             cand_predictor
             %in%paste0(
-              tmp3j$mod$trainingData %>%
+              best_each_method$mod$trainingData %>%
                 colnames() %>%
                 .[.!='.outcome'] %>%
                 sort()
@@ -9733,11 +9564,11 @@ if(show_best_tree){
         ,','
       )[[1]]
       & rank==as.numeric(
-        tmp3i %>%
+        eligible_biomarkers %>%
           filter(
             cand_predictor
             %in%paste0(
-              tmp3j$mod$trainingData %>%
+              best_each_method$mod$trainingData %>%
                 colnames() %>%
                 .[.!='.outcome'] %>%
                 sort()
@@ -9749,11 +9580,11 @@ if(show_best_tree){
           str_remove_all('rank')
       )
       & grank==as.numeric(
-        tmp3i %>%
+        eligible_biomarkers %>%
           filter(
             cand_predictor
             %in%paste0(
-              tmp3j$mod$trainingData %>%
+              best_each_method$mod$trainingData %>%
                 colnames() %>%
                 .[.!='.outcome'] %>%
                 sort()
@@ -9766,7 +9597,7 @@ if(show_best_tree){
       )
     ) %>%
     rbind(
-      left_join(.,tmp3c,by='gene') %>%
+      left_join(.,bestmod_list,by='gene') %>%
         filter(
           tissue.x!=tissue.y
           & blood_t.x==blood_t.y
@@ -9787,9 +9618,9 @@ if(show_best_tree){
 
 ```{r The surrogate transcriptome in the best model (any ranks), echo=FALSE}
 if(show_best_tree){
-  tmp3 %>%
-    left_join(tmp3b,c('tissue','blood_t')) %>%
-    left_join(tmp3c,c('tissue','gene','blood_t','avg_accu_w','rank')) %>%
+  bestmod_raw_weights %>%
+    left_join(bestmod_weights,c('tissue','blood_t')) %>%
+    left_join(bestmod_list,c('tissue','gene','blood_t','avg_accu_w','rank')) %>%
     select(blood_t,gene,tissue,avg_accu_w,rank,global_rank) %>%
     filter(!duplicated(.)) %>%
     lapply(X=c('FANCI'
@@ -9813,7 +9644,7 @@ if(show_best_tree){
 
 ```{r The best tree (training PE), eval=FALSE, fig.height=3, fig.width=3, include=FALSE}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -9828,7 +9659,7 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$trainingData %>%
     rename(outcome=.outcome) %>%
     rownames_to_column(var='id') %>%
@@ -9856,13 +9687,13 @@ if(show_best_tree){
       (early==0 & pe==1 & sga==0)
     ) %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The best tree (training EOPE), echo=FALSE, fig.height=3, fig.width=3}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -9877,7 +9708,7 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$trainingData %>%
     rename(outcome=.outcome) %>%
     rownames_to_column(var='id') %>%
@@ -9903,13 +9734,13 @@ if(show_best_tree){
       (early==1 & pe==1 & sga==0)
     ) %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The best tree (training LOPE), echo=FALSE, fig.height=3, fig.width=3}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -9924,7 +9755,7 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$trainingData %>%
     rename(outcome=.outcome) %>%
     rownames_to_column(var='id') %>%
@@ -9950,13 +9781,13 @@ if(show_best_tree){
       (early==0 & pe==1 & sga==0)
     ) %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The best tree (training COVID), echo=FALSE, fig.height=3, fig.width=3}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -9971,16 +9802,16 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$covid %>%
+  best_each_method$covid %>%
     filter(outcome=='event') %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The best tree (training no PE), echo=FALSE, fig.height=3, fig.width=3}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -9995,7 +9826,7 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$trainingData %>%
     rename(outcome=.outcome) %>%
     rownames_to_column(var='id') %>%
@@ -10023,13 +9854,13 @@ if(show_best_tree){
       # (early==0 & pe==1 & sga==0)
     ) %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The best tree (training normal), echo=FALSE, fig.height=3, fig.width=3}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -10044,7 +9875,7 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$trainingData %>%
     rename(outcome=.outcome) %>%
     rownames_to_column(var='id') %>%
@@ -10070,13 +9901,13 @@ if(show_best_tree){
       # (early==0 & pe==1 & sga==0)
     ) %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The best tree (training FGR), eval=FALSE, fig.height=3, fig.width=3, include=FALSE}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -10091,7 +9922,7 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$trainingData %>%
     rename(outcome=.outcome) %>%
     rownames_to_column(var='id') %>%
@@ -10117,13 +9948,13 @@ if(show_best_tree){
       # (early==0 & pe==1 & sga==0)
     ) %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
 ```{r The best tree (training no COVID), echo=FALSE, fig.height=3, fig.width=3}
 if(show_best_tree){
-  tmp3j$mod %>%
+  best_each_method$mod %>%
     .$finalModel %>%
     rpart.plot(
       type=5
@@ -10138,20 +9969,15 @@ if(show_best_tree){
       }
     )
   
-  tmp3j$covid %>%
+  best_each_method$covid %>%
     filter(outcome=='nonevent') %>%
     `colnames<-`(str_remove_all(colnames(.),'maternal_blood:')) %>%
-    tree_eval(tmp3j$mod,tmp3j$eval)
+    tree_eval(best_each_method$mod,best_each_method$eval)
 }
 ```
 
-```{r}
-timestamper['13. Biomarker emulation']=as.character(now())
-memstamper['13. Biomarker emulation']=memory.size()
-```
-
 ```{r Load the DIANA-mited miRNA data for PE, include=FALSE}
-tmp4=
+mirna_pe_fgrpe=
   read_tsv('data/diana_mited_20220302.tsv') %>%
   select(
     -S.No
@@ -10183,18 +10009,18 @@ tmp4=
 ```
 
 ```{r Load the GeneCards miRNA ID targeting the predictor genes, include=FALSE}
-tmp4b=
+mirna_target=
   read_csv('data/mirna.csv') %>%
   separate(mirna,c('miRNA','id'),sep=' \\(') %>%
   mutate(
     id=str_remove_all(id,'\\)')
     ,gene=factor(gene,unique(gene))
   ) %>%
-  left_join(tmp4,by='miRNA')
+  left_join(mirna_pe_fgrpe,by='miRNA')
 ```
 
 ```{r Summarize the number of miRNAs, eval=FALSE, include=FALSE}
-tmp4b %>%
+mirna_target %>%
   select(gene,miRNA,Tissue_or_organ_of_origin,Disease,Health_state) %>%
   filter(!duplicated(.)) %>%
   group_by(gene,Tissue_or_organ_of_origin,Disease,Health_state) %>%
@@ -10203,8 +10029,8 @@ tmp4b %>%
 ```
 
 ```{r Filter PE as outcome of the miRNA of interests, include=FALSE}
-tmp4c=
-  tmp4b %>%
+mirna_target_pe=
+  mirna_target %>%
   filter(
     !(Health_state=='event'
       & Disease=='Preeclampsia, intrauterine growth restriction')
@@ -10223,8 +10049,8 @@ tmp4c=
 ```
 
 ```{r Conduct regression analyses of the miRNAs on PE, include=FALSE}
-tmp4d=
-  tmp4c %>%
+mirna_target_OR_pe=
+  mirna_target_pe %>%
   filter(!is.na(Sample_ID)) %>%
   group_by(gene,miRNA,Disease,Health_state) %>%
   summarize(n=n()) %>%
@@ -10235,7 +10061,7 @@ tmp4d=
     ,p=event/total
   ) %>%
   filter(!(p==0|p==1)) %>%
-  left_join(tmp4c,by=c('gene','miRNA','Disease')) %>%
+  left_join(mirna_target_pe,by=c('gene','miRNA','Disease')) %>%
   group_by(gene,miRNA,Disease) %>%
   do(broom::tidy(suppressWarnings(
     glm(Health_state~log2RPM,data=.,family=binomial(link='logit'))
@@ -10251,14 +10077,14 @@ tmp4d=
 ```
 
 ```{r Determine total effect of miRNAs on PE per predictor, include=FALSE}
-tmp4e=
-  tmp4c %>%
+mirna_target_reg_pe=
+  mirna_target_pe %>%
   mutate(
     availability=
       ifelse(
         miRNA
         %in%pull(
-          tmp4c %>%
+          mirna_target_pe %>%
             filter(!is.na(Sample_ID)) %>%
             group_by(gene,miRNA,Disease,Health_state) %>%
             summarize(n=n()) %>%
@@ -10313,7 +10139,7 @@ tmp4e=
   ) %>%
   select(gene,availability,unavailable_miRNAs) %>%
   left_join(
-    tmp4d %>%
+    mirna_target_OR_pe %>%
       mutate(
         significance=
           ifelse(!is.na(OR) & (LB>1 | UB<1),'significant','not_significant')
@@ -10338,7 +10164,7 @@ tmp4e=
     ,by='gene'
   ) %>%
   left_join(
-    tmp4d %>%
+    mirna_target_OR_pe %>%
       filter(!is.na(OR) & (LB>1 | UB<1)) %>%
       mutate(
         regulation=ifelse(UB<1,'downregulated','upregulated')
@@ -10364,10 +10190,10 @@ tmp4e=
   )
 
 suppressWarnings(set.seed(33,sample.kind=sample.kind))
-tmp4e=
-  tmp4e %>%
+mirna_target_reg_pe=
+  mirna_target_reg_pe %>%
   left_join(
-    tmp4d %>%
+    mirna_target_OR_pe %>%
       filter(!is.na(OR) & (LB>1 | UB<1)) %>%
       mutate(
         regulation=ifelse(UB<1,'downregulated','upregulated')
@@ -10397,7 +10223,7 @@ tmp4e=
       ) %>%
       select(-downregulated,-upregulated) %>%
       left_join(
-        tmp4d %>%
+        mirna_target_OR_pe %>%
           filter(!is.na(OR) & (LB>1 | UB<1)) %>%
           mutate(
             regulation=ifelse(UB<1,'downregulated','upregulated')
@@ -10423,7 +10249,7 @@ tmp4e=
     ,by='gene'
   ) %>%
   left_join(
-    tmp4d %>%
+    mirna_target_OR_pe %>%
       filter(!is.na(OR) & (LB>1 | UB<1)) %>%
       mutate_at(c('OR','LB','UB'),format,digits=2,scientific=T)
     ,by='gene'
@@ -10431,8 +10257,8 @@ tmp4e=
 ```
 
 ```{r Filter PE-FGR as outcome of the miRNA of interests, include=FALSE}
-tmp4c2=
-  tmp4b %>%
+mirna_target_fgrpe=
+  mirna_target %>%
   filter(
     !(Health_state=='event'
       & Disease=='Preeclampsia')
@@ -10451,8 +10277,8 @@ tmp4c2=
 ```
 
 ```{r Conduct regression analyses of the miRNAs on PE-FGR, include=FALSE}
-tmp4d2=
-  tmp4c2 %>%
+mirna_target_OR_fgrpe=
+  mirna_target_fgrpe %>%
   filter(!is.na(Sample_ID)) %>%
   group_by(gene,miRNA,Disease,Health_state) %>%
   summarize(n=n()) %>%
@@ -10463,7 +10289,7 @@ tmp4d2=
     ,p=event/total
   ) %>%
   filter(!(p==0|p==1)) %>%
-  left_join(tmp4c2,by=c('gene','miRNA','Disease')) %>%
+  left_join(mirna_target_fgrpe,by=c('gene','miRNA','Disease')) %>%
   group_by(gene,miRNA,Disease) %>%
   do(broom::tidy(suppressWarnings(
     glm(Health_state~log2RPM,data=.,family=binomial(link='logit'))
@@ -10479,14 +10305,14 @@ tmp4d2=
 ```
 
 ```{r Determine total effect of miRNAs on PE-FGR per predictor, include=FALSE}
-tmp4e2=
-  tmp4c2 %>%
+mirna_target_reg_fgrpe=
+  mirna_target_fgrpe %>%
   mutate(
     availability=
       ifelse(
         miRNA
         %in%pull(
-          tmp4c2 %>%
+          mirna_target_fgrpe %>%
             filter(!is.na(Sample_ID)) %>%
             group_by(gene,miRNA,Disease,Health_state) %>%
             summarize(n=n()) %>%
@@ -10541,7 +10367,7 @@ tmp4e2=
   ) %>%
   select(gene,availability,unavailable_miRNAs) %>%
   left_join(
-    tmp4d2 %>%
+    mirna_target_OR_fgrpe %>%
       mutate(
         significance=
           ifelse(!is.na(OR) & (LB>1 | UB<1),'significant','not_significant')
@@ -10566,7 +10392,7 @@ tmp4e2=
     ,by='gene'
   ) %>%
   left_join(
-    tmp4d2 %>%
+    mirna_target_OR_fgrpe %>%
       filter(!is.na(OR) & (LB>1 | UB<1)) %>%
       mutate(
         regulation=ifelse(UB<1,'downregulated','upregulated')
@@ -10592,10 +10418,10 @@ tmp4e2=
   )
 
 suppressWarnings(set.seed(33,sample.kind=sample.kind))
-tmp4e2=
-  tmp4e2 %>%
+mirna_target_reg_fgrpe=
+  mirna_target_reg_fgrpe %>%
   left_join(
-    tmp4d2 %>%
+    mirna_target_OR_fgrpe %>%
       filter(!is.na(OR) & (LB>1 | UB<1)) %>%
       mutate(
         regulation=ifelse(UB<1,'downregulated','upregulated')
@@ -10626,7 +10452,7 @@ tmp4e2=
       ) %>%
       select(-downregulated,-upregulated) %>%
       left_join(
-        tmp4d2 %>%
+        mirna_target_OR_fgrpe %>%
           filter(!is.na(OR) & (LB>1 | UB<1)) %>%
           mutate(
             regulation=ifelse(UB<1,'downregulated','upregulated')
@@ -10652,7 +10478,7 @@ tmp4e2=
     ,by='gene'
   ) %>%
   left_join(
-    tmp4d2 %>%
+    mirna_target_OR_fgrpe %>%
       filter(!is.na(OR) & (LB>1 | UB<1)) %>%
       mutate_at(c('OR','LB','UB'),format,digits=2,scientific=T)
     ,by='gene'
@@ -10660,16 +10486,11 @@ tmp4e2=
 ```
 
 ```{r Total effect of miRNAs on PE per predictor, echo=FALSE}
-tmp4e
+mirna_target_reg_pe
 ```
 
 ```{r Total effect of miRNAs on PE-FGR per predictor, echo=FALSE}
-tmp4e2
-```
-
-```{r}
-timestamper['14. Interpretation with miRNA']=as.character(now())
-memstamper['14. Interpretation with miRNA']=memory.size()
+mirna_target_reg_fgrpe
 ```
 
 ```{r Create a function to show the shortest path, include=FALSE}
@@ -10677,7 +10498,7 @@ source('R/show_shortest_path-function.R')
 ```
 
 ```{r Load the STRING PPI data of the biomarkers and surrogates, include=FALSE}
-tmp5=
+ppi_string=
   list(
     blood_20220303=c('ITGA5','P2RX7','IRF6')
     ,blcord_20220303=c('ITGA5','FANCI','TSEN15')
@@ -10765,8 +10586,8 @@ tmp5=
         )
   )
 
-tmp5=
-  tmp5 %>%
+ppi_string=
+  ppi_string %>%
   lapply(X=names(.),Y=.,function(X,Y){
     list(
       inputs=Y[[X]]
@@ -10776,24 +10597,24 @@ tmp5=
       ,pubmeds=read_tsv(paste0('data/',X,'_enrichment.PMID.tsv'))
     )
   }) %>%
-  setNames(names(tmp5))
+  setNames(names(ppi_string))
 ```
 
 ```{r Identify and show the shortest paths, include=FALSE}
-tmp5=
-  tmp5 %>%
+ppi_string=
+  ppi_string %>%
   pblapply(X=names(.),Y=.,function(X,Y){
     Y[[X]] %>%
       .[!names(.)%in%c('combination','shortest_path')] %>%
       c(show_shortest_path(Y[[X]],X))
   }) %>%
-  setNames(names(tmp5))
+  setNames(names(ppi_string))
 ```
 
 ```{r Select the pathways overrepresented by the shortest paths, include=FALSE}
 if(run_heavy_computation){
-  tmp6=
-    tmp5 %>%
+  ppi_pathways=
+    ppi_string %>%
     lapply(X=names(.),Y=.,function(X,Y){
       Z=Y[[X]]$pubmeds %>%
         mutate(`#category`='PubMed') %>%
@@ -10921,17 +10742,17 @@ if(run_heavy_computation){
           ,everything()
         )
     }) %>%
-    setNames(names(tmp5))
+    setNames(names(ppi_string))
   
-  saveRDS(tmp6,'data/tmp6.rds')
+  saveRDS(ppi_pathways,'data/ppi_pathways.rds')
 }else{
-  cat(readRDS('data/log.rds')[['tmp6']])
-  tmp6=readRDS('data/tmp6.rds')
+  cat(readRDS('data/log.rds')[['ppi_pathways']])
+  ppi_pathways=readRDS('data/ppi_pathways.rds')
 }
 ```
 
 ```{r Show the selected pathways, eval=FALSE, include=FALSE}
-tmp6 %>%
+ppi_pathways %>%
   lapply(
     arrange
     ,desc(observed_gene_count),genes,background_gene_class,desc(strength)
@@ -10941,7 +10762,7 @@ tmp6 %>%
 ```
 
 ```{r Select and show the PMID pathways, eval=FALSE, include=FALSE}
-tmp5 %>%
+ppi_string %>%
   lapply(X=names(.),Y=.,function(X,Y){
     Y[[X]]$pathways %>%
       rbind(
@@ -10993,7 +10814,7 @@ tmp5 %>%
 ```
 
 ```{r Identify available types of the interaction, eval=FALSE, include=FALSE}
-tmp5 %>%
+ppi_string %>%
   lapply(X=names(.),Y=.,function(X,Y){
     Y[[X]]$edges %>%
       mutate(id=X)
@@ -11012,14 +10833,9 @@ tmp5 %>%
   summarize(total=n())
 ```
 
-```{r}
-timestamper['15. Interpretation with p-p interaction']=as.character(now())
-memstamper['15. Interpretation with p-p interaction']=memory.size()
-```
-
 ```{r Load PTM and protein data, include=FALSE}
-tmp7=read_csv('data/ptm.csv')
-tmp7b=
+ptm_genes=read_csv('data/ptm.csv')
+ptm_effects=
   read_csv('data/ptm_effect.csv') %>%
   # https://en.wikipedia.org/wiki/ADP-ribosylation
   rbind(
@@ -11033,17 +10849,17 @@ tmp7b=
       ,covalent_attachment='small chemical group'
     )
   )
-tmp8=read_csv('data/protein.csv')
+protein_exprs=read_csv('data/protein.csv')
 ```
 
 ```{r Identify location of protein overexpression and the PTM effect, echo=TRUE}
 rbind(
-    tmp7 %>%
+    ptm_genes %>%
       rename(entity=gene) %>%
       mutate(type='protein') %>%
       mutate(ptm=ifelse(ptm=='ADP-ribosylation','ribosylation',ptm)) %>%
       left_join(
-        tmp7b %>%
+        ptm_effects %>%
           mutate(
             ptm=
               str_sub(
@@ -11058,7 +10874,7 @@ rbind(
           filter(!duplicated(.))
         ,by='ptm'
       )
-    ,tmp7b %>%
+    ,ptm_effects %>%
       mutate(
         ptm=
           str_sub(
@@ -11144,9 +10960,9 @@ rbind(
     value=
       entity
       %in%pull(
-        tmp8 %>%
+        protein_exprs %>%
           rbind(
-            rbind(tmp4e,tmp4e2) %>%
+            rbind(mirna_target_reg_pe,mirna_target_reg_fgrpe) %>%
               filter(
                 sapply(downregulation,function(x){
                   y=str_split(x,'\\s+')[[1]][2] %>%
@@ -11237,125 +11053,3 @@ rbind(
     ,legend.position='top'
   )
 ```
-
-```{r}
-timestamper['16. Interpretation with PTM']=as.character(now())
-memstamper['16. Interpretation with PTM']=memory.size()
-```
-
-```{r}
-timestamper %>%
-  data.frame(seq=seq(0,length(.)-1),timestamp=.) %>%
-  rownames_to_column(var='label') %>%
-  mutate(label=factor(label,rev(unique(label)))) %>%
-  mutate(timestamp=as_datetime(timestamp)) %>%
-  mutate(timestamp=timestamp-min(timestamp)) %>%
-  mutate(timestamp=as.duration(timestamp)/dminutes(1)) %>%
-  left_join(
-    mutate(.,seq=seq+1) %>%
-      rename(timestamp0=timestamp) %>%
-      select(-label)
-    ,by='seq'
-  ) %>%
-  slice(-1) %>%
-  mutate(duration=timestamp-timestamp0) %>%
-  select(-timestamp0) %>%
-  gather(metric,value,-label,-seq) %>%
-  ggplot(aes(label,value)) +
-  geom_col() +
-  facet_wrap(~metric,scales='free_x') +
-  coord_flip()
-```
-
-```{r}
-file_info=
-  list.files('.',recursive=T) %>%
-  data.frame(path=.) %>%
-  mutate(
-    size=
-      path %>%
-      pblapply(file.info) %>%
-      pbsapply(function(x)x$size)
-  )
-```
-
-```{r}
-big_files=
-  file_info %>%
-  mutate(github=size<25000000) %>%
-  filter(!github) %>%
-  mutate(
-    file=
-      path %>%
-      sapply(function(x){
-        x %>%
-          str_locate_all('/') %>%
-          .[[1]] %>%
-          .[dim(.)[1],] %>%
-          .['start']
-      })
-    ,file=
-      path %>%
-      str_sub(file+1,str_length(path))
-  )
-
-# file.rename(big_files$path,paste0('../pest_drive/',big_files$file))
-# saveRDS(big_files,'data/big_files.rds')
-```
-
-```{r}
-memstamper %>%
-  data.frame(seq=seq(0,length(.)-1),memstamp=.) %>%
-  rownames_to_column(var='label') %>%
-  mutate(label=factor(label,rev(unique(label)))) %>%
-  mutate(memstamp=memstamp-min(memstamp)) %>%
-  left_join(
-    mutate(.,seq=seq+1) %>%
-      rename(memstamp0=memstamp) %>%
-      select(-label)
-    ,by='seq'
-  ) %>%
-  slice(-1) %>%
-  mutate(memory_size=memstamp-memstamp0) %>%
-  select(-memstamp0) %>%
-  gather(metric,value,-label,-seq) %>%
-  ggplot(aes(label,value)) +
-  geom_col() +
-  facet_wrap(~metric,scales='free_x') +
-  coord_flip()
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
