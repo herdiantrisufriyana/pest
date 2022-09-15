@@ -2,18 +2,25 @@
 
 Herdiantri Sufriyana,a,b Hotimah Masdan Salim,c Akbar Reza Muhammad,d Yu-Wei 
 Wu,a,e Emily Chia-Yu Sua,e,f, *
+
 a Graduate Institute of Biomedical Informatics, College of Medical Science and 
 Technology, Taipei Medical University, 250 Wu-Xing Street, Taipei 11031, Taiwan.
+
 b Department of Medical Physiology, Faculty of Medicine, Universitas Nahdlatul 
 Ulama Surabaya, 57 Raya Jemursari Road, Surabaya 60237, Indonesia.
+
 c Department of Molecular Biology, Faculty of Medicine, Universitas Nahdlatul 
 Ulama Surabaya, 57 Raya Jemursari Road, Surabaya 60237, Indonesia.
+
 d Faculty of Medicine, Universitas Nahdlatul Ulama Surabaya, 57 Raya Jemursari 
 Road, Surabaya 60237, Indonesia.
+
 e Clinical Big Data Research Center, Taipei Medical University Hospital, 250 
 Wu-Xing Street, Taipei 11031, Taiwan.
+
 f Research Center for Artificial Intelligence in Medicine, Taipei Medical 
 University, 250 Wu-Xing Street, Taipei 11031, Taiwan.
+
 \* Corresponding author: Clinical Big Data Research Center, Taipei Medical 
 University Hospital, 250 Wu-Xing Street, Taipei 11031, Taiwan. Phone: 
 +886-2-66382736 ext. 1515. Email address: emilysu@tmu.edu.tw.
