@@ -45,6 +45,23 @@ if(paste0(version$major,'.',version$minor)!=r_version){
 }
 ```
 
+```{r Ensure the zip files exist}
+if(file.exists('pest_files.zip')){
+  if(!file.exists('renv')) unzip('pest_files.zip')
+}else{
+  if(!file.exists('renv')){
+    stop(
+      paste0(
+        'Please manually dowload the zip files (17.47 GB) from this link '
+        ,'(https://drive.google.com/file/d/12sIGr0ys07WyMNDdZ55hmhTzF7PRoBA4/view?usp=sharing) '
+        ,'Put the zip file the same folder with this pest.Rmd and pest.R'
+        ,r_version
+      )
+    )
+  }
+}
+```
+
 ```{r Set up reproducible environment, include=FALSE}
 renv::activate()
 renv::restore(prompt=F)
@@ -2121,7 +2138,7 @@ GSE177477=
 rownames(GSE108497) %>%
   data.frame(gene=.) %>%
   mutate(
-    ,gene_in_covid19_array=ifelse(gene%in%rownames(GSE177477),1,0)
+    gene_in_covid19_array=ifelse(gene%in%rownames(GSE177477),1,0)
     ,this_study=1
     ,common_predictor=ifelse(gene%in%c('ADAM12','FLT1','PAPPA2'),1,0)
     ,cfRNA=
@@ -4509,6 +4526,10 @@ dea %>%
   )
 ```
 
+# Predictive modeling
+
+## Construct the development and validation datasets
+
 ```{r Create a function for Q-Q normalization targeting controls, include=FALSE}
 source('R/dea_qn-function.R')
 ```
@@ -5655,6 +5676,8 @@ degs_all_datasets=
       ,'GSE108497 and GSE149437')
   )
 ```
+
+## Model training
 
 ```{r Create a function to train a non-DIVNN prediction model, include=FALSE}
 source('R/disease_train-function.R')
@@ -6968,6 +6991,8 @@ if(run_heavy_computation){
 }
 ```
 
+## Model calibration
+
 ```{r Create a function to compare calibration of the models, include=FALSE}
 source('R/calib_comparison-function.R')
 ```
@@ -7037,6 +7062,8 @@ calib_comparison('calib_model') %>%
   scale_color_manual('',values=c('red','blue')) +
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
 ```
+
+## Model evaluation
 
 ```{r Create a function to get model weights, include=FALSE}
 source('R/opt_feat_disease_fn-function.R')
@@ -7541,9 +7568,7 @@ bestmod_ppv %>%
   arrange(set)
 ```
 
-```{r}
-emul=list()
-```
+# Biomarker emulation
 
 ```{r Get PC weights from the best model, include=FALSE}
 if(run_heavy_computation){
@@ -7684,7 +7709,6 @@ if(run_heavy_computation & show_best_tree){
   bestmod_list=readRDS('data/bestmod_list.rds')
 }
 ```
-
 
 ```{r Ensure all tissues included by the criteria, eval=FALSE, include=FALSE}
 bestmod_list %>%
@@ -9293,6 +9317,10 @@ eligible_biomarkers %>%
   )
 ```
 
+# Justification of the biological relevance
+
+## Best biomarkers
+
 ```{r Get the best tree from the best method of discovery, include=FALSE}
 if(load_emulators){
   best_each_method=
@@ -9976,6 +10004,8 @@ if(show_best_tree){
 }
 ```
 
+## miRNA
+
 ```{r Load the DIANA-mited miRNA data for PE, include=FALSE}
 mirna_pe_fgrpe=
   read_tsv('data/diana_mited_20220302.tsv') %>%
@@ -10493,6 +10523,8 @@ mirna_target_reg_pe
 mirna_target_reg_fgrpe
 ```
 
+## PPI
+
 ```{r Create a function to show the shortest path, include=FALSE}
 source('R/show_shortest_path-function.R')
 ```
@@ -10832,6 +10864,8 @@ ppi_string %>%
   group_by(interaction) %>%
   summarize(total=n())
 ```
+
+## PTM
 
 ```{r Load PTM and protein data, include=FALSE}
 ptm_genes=read_csv('data/ptm.csv')
